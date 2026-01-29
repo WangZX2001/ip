@@ -13,6 +13,7 @@ public class Algo {
                     |_| |_| |_____\\____/  \\___/
                     """;
     private static final String[] tasks = new String[100];
+    private static final boolean[] isTaskCompleted = new boolean[100];
     private static int taskCount = 0;
 
 
@@ -26,6 +27,10 @@ public class Algo {
 
             if (input.equalsIgnoreCase("list")) {
                 printList();
+            } else if (input.startsWith("mark ")) {
+                handleMarkMessage(input, true);
+            } else if (input.startsWith("unmark ")) {
+                handleMarkMessage(input, false);
             } else {
                 addTask(input);
             }
@@ -53,6 +58,7 @@ public class Algo {
             System.out.println(LINE);
         } else {
             tasks[taskCount] = task;
+            isTaskCompleted[taskCount] = false;
             taskCount++;
             System.out.println(LINE);
             System.out.println( "add: " + task);
@@ -64,10 +70,67 @@ public class Algo {
         if (taskCount == 0) {
             System.out.println("No tasks yet");
         } else {
+            System.out.println("Here are the tasks in your list:");
             for (int i = 0; i < taskCount; i++) {
-                System.out.println((i + 1) + ". " + tasks[i]);
+                String status;
+
+                if (isTaskCompleted[i]) {
+                    status = "[X]";
+                } else {
+                    status = "[ ]";
+                }
+                System.out.println((i + 1) + "." + status + " " + tasks[i]);
             }
         }
         System.out.println(LINE);
     }
+    private static void handleMarkMessage(String input, boolean isDone) {
+
+        String prefix;
+
+        if (isDone) {
+            prefix = "mark ";
+        } else {
+            prefix = "unmark ";
+        }
+
+        String numberPart = input.substring(prefix.length());
+
+        //Edge case 1: Number is missing
+        if (numberPart.isEmpty()) {
+            System.out.println("Please specify a task number.");
+            System.out.println(LINE);
+            return;
+        }
+
+        int taskNumber = Integer.parseInt(numberPart);
+        //Edge case 2: not a positive number
+        if (taskNumber < 1) {
+            System.out.println("Task number must be at least 1.");
+            System.out.println(LINE);
+            return;
+        }
+
+        int index = taskNumber - 1;
+        //Edge case: out of range
+        if (index >= taskCount) {
+            System.out.println("Invalid task number. You only can have " + taskCount + " tasks");
+            System.out.println(LINE);
+            return;
+        }
+
+        isTaskCompleted[index] = isDone;
+
+        System.out.println(LINE);
+
+        if (isDone) {
+            System.out.println("Nice! I've marked this task as done:");
+            System.out.println("  " + "[X]" + tasks[index]);
+        } else {
+            System.out.println("OK, I've marked this task as not done yet:");
+            System.out.println("  " + "[ ]" + tasks[index]);
+        }
+        System.out.println(LINE);
+    }
+
 }
