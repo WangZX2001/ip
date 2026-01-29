@@ -12,8 +12,7 @@ public class Algo {
                     |  _  | | |___| |_| || |_| |
                     |_| |_| |_____\\____/  \\___/
                     """;
-    private static final String[] tasks = new String[100];
-    private static final boolean[] isTaskCompleted = new boolean[100];
+    private static final Task[] tasks = new Task[100];
     private static int taskCount = 0;
 
 
@@ -40,97 +39,82 @@ public class Algo {
         in.close();
     }
 
-    private static void printByeMessage() {
-        System.out.println("Bye. Hope to see you again soon!");
-        System.out.println(LINE);
+    private static void printLine() { System.out.println(LINE); }
 
-    }
     private static void printGreeting() {
-        System.out.println(LINE);
+        printLine();
         System.out.println(LOGO);
         System.out.println("Hello! I'm " + BOT_NAME);
         System.out.println("What can I do for you?");
-        System.out.println(LINE);
+        printLine();
     }
-    private static void addTask(String task) {
+
+    private static void printByeMessage() {
+        System.out.println("Bye. Hope to see you again soon!");
+        printLine();
+
+    }
+
+    private static void addTask(String description) {
         if (taskCount == tasks.length) {
             System.out.println("Task list is full");
             System.out.println(LINE);
+            return;
         } else {
-            tasks[taskCount] = task;
-            isTaskCompleted[taskCount] = false;
-            taskCount++;
-            System.out.println(LINE);
-            System.out.println( "add: " + task);
+            tasks[taskCount++] = new Task(description);
+            System.out.println("added: " + description);
             System.out.println(LINE);
         }
     }
+
     private static void printList() {
-        System.out.println(LINE);
+        printLine();
+
         if (taskCount == 0) {
             System.out.println("No tasks yet");
+            printLine();
+            return;
         } else {
             System.out.println("Here are the tasks in your list:");
             for (int i = 0; i < taskCount; i++) {
-                String status;
-
-                if (isTaskCompleted[i]) {
-                    status = "[X]";
-                } else {
-                    status = "[ ]";
-                }
-                System.out.println((i + 1) + "." + status + " " + tasks[i]);
+                Task t = tasks[i];
+                System.out.println((i + 1) + "." + tasks[i]);
             }
         }
-        System.out.println(LINE);
+        printLine();
     }
-    private static void handleMarkMessage(String input, boolean isDone) {
 
-        String prefix;
+    private static void handleMarkMessage(String input, boolean isMarkedAsDone) {
 
-        if (isDone) {
-            prefix = "mark ";
-        } else {
-            prefix = "unmark ";
-        }
-
-        String numberPart = input.substring(prefix.length());
+        String prefix = isMarkedAsDone ? "mark " : "unmark ";
+        String numberPart = input.substring(prefix.length()).trim();
 
         //Edge case 1: Number is missing
         if (numberPart.isEmpty()) {
             System.out.println("Please specify a task number.");
-            System.out.println(LINE);
+            printLine();
             return;
         }
 
-        int taskNumber = Integer.parseInt(numberPart);
-        //Edge case 2: not a positive number
-        if (taskNumber < 1) {
-            System.out.println("Task number must be at least 1.");
-            System.out.println(LINE);
+        int index = Integer.parseInt(numberPart) - 1;
+        //Edge case 2: not a positive number or out of range
+        if (index < 0 || index >= taskCount) {
+            System.out.println("Invalid task number.");
+            printLine();
             return;
         }
 
-        int index = taskNumber - 1;
-        //Edge case: out of range
-        if (index >= taskCount) {
-            System.out.println("Invalid task number. You only can have " + taskCount + " tasks");
-            System.out.println(LINE);
-            return;
-        }
+        Task t = tasks[index];
+        printLine();
 
-        isTaskCompleted[index] = isDone;
-
-        System.out.println(LINE);
-
-        if (isDone) {
+        if (isMarkedAsDone) {
+            t.markAsCompleted();
             System.out.println("Nice! I've marked this task as done:");
-            System.out.println("  " + "[X]" + tasks[index]);
         } else {
+            t.markAsNotCompleted();
             System.out.println("OK, I've marked this task as not done yet:");
-            System.out.println("  " + "[ ]" + tasks[index]);
         }
-        System.out.println(LINE);
+        System.out.println(t);
+        printLine();
     }
-
 }
