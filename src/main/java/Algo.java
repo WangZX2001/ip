@@ -20,7 +20,7 @@ public class Algo {
         Scanner in = new Scanner(System.in);
 
         printGreeting();
-        String input = in.nextLine();
+        String input = in.nextLine().trim();
 
         while (!input.equalsIgnoreCase("bye")) {
 
@@ -58,26 +58,22 @@ public class Algo {
     private static void addTask(String description) {
         if (taskCount == tasks.length) {
             System.out.println("Task list is full");
-            System.out.println(LINE);
-            return;
+            printLine();
         } else {
             tasks[taskCount++] = new Task(description);
             System.out.println("added: " + description);
-            System.out.println(LINE);
+            printLine();
         }
     }
 
     private static void printList() {
         printLine();
-
         if (taskCount == 0) {
             System.out.println("No tasks yet");
             printLine();
-            return;
         } else {
             System.out.println("Here are the tasks in your list:");
             for (int i = 0; i < taskCount; i++) {
-                Task t = tasks[i];
                 System.out.println((i + 1) + "." + tasks[i]);
             }
         }
