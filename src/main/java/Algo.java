@@ -53,7 +53,6 @@ public class Algo {
     private static void printByeMessage() {
         System.out.println("Bye. Hope to see you again soon!");
         printLine();
-
     }
 
     private static void addTask(String input) {
@@ -62,36 +61,37 @@ public class Algo {
             printLine();
             return;
         }
-
-        Task task;
-        if (input.startsWith("deadline ")) {
-            String content = input.substring(9).trim();
-            String[] parts = content.split(" /by ", 2);
-
-            String desc = parts[0].trim();
-            String by = parts[1].trim();
-            task = new Deadline(desc, by);
-
-        } else if (input.startsWith("todo ")) {
-            String desc = input.substring(5).trim();
-            task = new Todo(desc);
-        } else if (input.startsWith("event ")){
-            String content = input.substring(6).trim();
-            String[] parts = content.split("/from | /to", 3);
-
-            String desc = parts[0].trim();
-            String from = parts[1].trim();
-            String to = parts[2].trim();
-            task = new Event(desc, from, to);
-        } else {
-            task = new Task(input);
-        }
+        Task task = createTask(input);
         tasks[taskCount++] = task;
         printLine();
         System.out.println("Got it. I've added this task:");
         System.out.println(task);
         System.out.println("Now you have " + taskCount + " tasks in the list.");
         printLine();
+    }
+
+    private static Task createTask(String input) {
+        if (input.startsWith("deadline ")) {
+            String content = input.substring("deadline ".length()).trim();
+            String[] parts = content.split(" /by ", 2);
+
+            String description = parts[0].trim();
+            String by = parts[1].trim();
+            return new Deadline(description, by);
+
+        } else if (input.startsWith("todo ")) {
+            String description = input.substring("todo ".length()).trim();
+            return new Todo(description);
+        } else if (input.startsWith("event ")) {
+            String content = input.substring("event ".length()).trim();
+            String[] parts = content.split("/from | /to", 3);
+
+            String description = parts[0].trim();
+            String from = parts[1].trim();
+            String to = parts[2].trim();
+            return new Event(description, from, to);
+        }
+        return new Task(input);
     }
 
     private static void printList() {
