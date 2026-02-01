@@ -12,7 +12,8 @@ public class Algo {
                     |  _  | | |___| |_| || |_| |
                     |_| |_| |_____\\____/  \\___/
                     """;
-    private static final Task[] tasks = new Task[100];
+    public static final int MAX_NUMBER_OF_TASKS = 100;
+    private static final Task[] tasks = new Task[MAX_NUMBER_OF_TASKS];
     private static int taskCount = 0;
 
 
@@ -55,15 +56,31 @@ public class Algo {
 
     }
 
-    private static void addTask(String description) {
+    private static void addTask(String input) {
         if (taskCount == tasks.length) {
             System.out.println("Task list is full");
             printLine();
-        } else {
-            tasks[taskCount++] = new Task(description);
-            System.out.println("added: " + description);
-            printLine();
+            return;
         }
+
+        Task task;
+        if (input.startsWith("deadline ")) {
+            String content = input.substring(9).trim();
+            String[] parts = content.split(" /by ", 2);
+
+            String desc = parts[0].trim();
+            String by = parts[1].trim();
+
+            task = new Deadline(desc, by);
+        } else  {
+            task = new Task(input);
+        }
+        tasks[taskCount++] = task;
+        printLine();
+        System.out.println("Got it. I've added this task:");
+        System.out.println(task);
+        System.out.println("Now you have " + taskCount + " tasks in the list.");
+        printLine();
     }
 
     private static void printList() {
