@@ -70,9 +70,12 @@ public class Algo {
 
             String desc = parts[0].trim();
             String by = parts[1].trim();
-
             task = new Deadline(desc, by);
-        } else  {
+
+        } else if (input.startsWith("todo ")) {
+            String desc = input.substring(5).trim();
+            task = new Todo(desc);
+        } else {
             task = new Task(input);
         }
         tasks[taskCount++] = task;
