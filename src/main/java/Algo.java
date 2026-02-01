@@ -101,13 +101,12 @@ public class Algo {
         }
 
         Task t = tasks[index];
+        t.setDone(isMarkedAsDone);
         printLine();
 
         if (isMarkedAsDone) {
-            t.markAsCompleted();
             System.out.println("Nice! I've marked this task as done:");
         } else {
-            t.markAsNotCompleted();
             System.out.println("OK, I've marked this task as not done yet:");
         }
         System.out.println(t);

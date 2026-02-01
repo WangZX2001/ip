@@ -10,12 +10,8 @@ public class Task {
         return (isDone? "X": " ");
     }
 
-    public void markAsCompleted() {
-        isDone = true;
-    }
-
-    public void markAsNotCompleted() {
-        isDone = false;
+    public void setDone(boolean isDone) {
+        this.isDone = isDone;
     }
 
     @Override
