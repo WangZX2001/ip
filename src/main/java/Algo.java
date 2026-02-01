@@ -21,7 +21,13 @@ public class Algo {
         Scanner in = new Scanner(System.in);
 
         printGreeting();
+        executeCommand(in);
+        printByeMessage();
 
+        in.close();
+    }
+
+    private static void executeCommand(Scanner in) {
         while (true) {
             String input = in.nextLine().trim();
 
@@ -37,9 +43,6 @@ public class Algo {
                 addTask(input);
             }
         }
-
-        printByeMessage();
-        in.close();
     }
 
     private static void printLine() { System.out.println(LINE); }
