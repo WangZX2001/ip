@@ -21,11 +21,13 @@ public class Algo {
         Scanner in = new Scanner(System.in);
 
         printGreeting();
-        String input = in.nextLine().trim();
 
-        while (!input.equalsIgnoreCase("bye")) {
+        while (true) {
+            String input = in.nextLine().trim();
 
-            if (input.equalsIgnoreCase("list")) {
+            if (input.equalsIgnoreCase("bye")) {
+                break;
+            } else if (input.equalsIgnoreCase("list")) {
                 printList();
             } else if (input.startsWith("mark ")) {
                 handleMarkMessage(input, true);
@@ -34,8 +36,8 @@ public class Algo {
             } else {
                 addTask(input);
             }
-            input = in.nextLine();
         }
+
         printByeMessage();
         in.close();
     }
