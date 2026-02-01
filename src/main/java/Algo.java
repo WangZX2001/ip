@@ -75,6 +75,14 @@ public class Algo {
         } else if (input.startsWith("todo ")) {
             String desc = input.substring(5).trim();
             task = new Todo(desc);
+        } else if (input.startsWith("event ")){
+            String content = input.substring(6).trim();
+            String[] parts = content.split("/from | /to", 3);
+
+            String desc = parts[0].trim();
+            String from = parts[1].trim();
+            String to = parts[2].trim();
+            task = new Event(desc, from, to);
         } else {
             task = new Task(input);
         }
