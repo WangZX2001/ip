@@ -6,12 +6,12 @@ public class Algo {
     private static final String LINE = "________________________________________________________";
     private static final String LOGO =
             """
-                      ___    _      ____   ___ \s
-                     / _ \\  | |    / ___| / _ \\\s
-                    / /_\\ \\ | |   | |  _ | | | |
-                    |  _  | | |___| |_| || |_| |
-                    |_| |_| |_____\\____/  \\___/
-                    """;
+              ___    _      ____   ___
+             / _ \\  | |    / ___| / _ \\
+            / /_\\ \\ | |   | |  _ | | | |
+            |  _  | | |___| |_| || |_| |
+            |_| |_| |_____\\____/  \\___/
+            """;
     public static final int MAX_NUMBER_OF_TASKS = 100;
     private static final Task[] tasks = new Task[MAX_NUMBER_OF_TASKS];
     private static int taskCount = 0;
@@ -28,7 +28,7 @@ public class Algo {
     }
 
     private static void executeCommand(Scanner in) {
-        while (true) {
+        while (in.hasNextLine()) {
             String input = in.nextLine().trim();
 
             if (input.equalsIgnoreCase("bye")) {
