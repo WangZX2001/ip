@@ -99,7 +99,11 @@ public class Algo {
         if (lower.startsWith("event")) {
             return getEvent(input.substring("event".length()).trim());
         }
-        throw new AlgoException("Invalid command.");
+        throw new AlgoException(
+                "Invalid command. Try:\n" +
+                        "todo, deadline, event, mark, unmark, list, bye"
+        );
+
     }
 
     private static Event getEvent(String args) throws AlgoException {
