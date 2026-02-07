@@ -30,6 +30,7 @@ public class Algo {
     private static void executeCommand(Scanner in) {
         while (in.hasNextLine()) {
             String input = in.nextLine().trim();
+            String lower = input.toLowerCase();
 
             try {
                 if (input.equalsIgnoreCase("bye")) {
@@ -39,11 +40,11 @@ public class Algo {
                     printList();
                     continue;
                 }
-                if (input.toLowerCase().startsWith("mark ")) {
+                if (lower.equals("mark") || lower.startsWith("mark ")) {
                     handleMarkMessage(input, true);
                     continue;
                 }
-                if (input.toLowerCase().startsWith("unmark ")) {
+                if (lower.equals("unmark") || lower.startsWith("unmark ")) {
                     handleMarkMessage(input, false);
                     continue;
                 }
@@ -168,10 +169,25 @@ public class Algo {
 
     private static void handleMarkMessage(String input, boolean isMarkedAsDone) throws AlgoException {
 
-        String prefix = isMarkedAsDone ? "mark " : "unmark ";
+        String prefix = isMarkedAsDone ? "mark" : "unmark";
         String numberPart = input.substring(prefix.length()).trim();
 
-        //Edge case 1: Number is missing
+        int index = parseTaskIndex(numberPart);
+        Task t = tasks[index];
+        t.setDone(isMarkedAsDone);
+
+        printLine();
+
+        if (isMarkedAsDone) {
+            System.out.println("Nice! I've marked this task as done:");
+        } else {
+            System.out.println("OK, I've marked this task as not done yet:");
+        }
+        System.out.println(t);
+        printLine();
+    }
+
+    private static int parseTaskIndex(String numberPart) throws AlgoException {
         if (numberPart.isEmpty()) {
             throw new AlgoException("Please specify a task number.");
         }
@@ -186,17 +202,6 @@ public class Algo {
         if (index < 0 || index >= taskCount) {
             throw new AlgoException("Invalid task number.");
         }
-
-        Task t = tasks[index];
-        t.setDone(isMarkedAsDone);
-        printLine();
-
-        if (isMarkedAsDone) {
-            System.out.println("Nice! I've marked this task as done:");
-        } else {
-            System.out.println("OK, I've marked this task as not done yet:");
-        }
-        System.out.println(t);
-        printLine();
+        return index;
     }
 }
