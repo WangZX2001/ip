@@ -31,16 +31,22 @@ public class Algo {
         while (in.hasNextLine()) {
             String input = in.nextLine().trim();
 
-            if (input.equalsIgnoreCase("bye")) {
-                break;
-            } else if (input.equalsIgnoreCase("list")) {
-                printList();
-            } else if (input.startsWith("mark ")) {
-                handleMarkMessage(input, true);
-            } else if (input.startsWith("unmark ")) {
-                handleMarkMessage(input, false);
-            } else {
-                addTask(input);
+            try {
+                if (input.equalsIgnoreCase("bye")) {
+                    break;
+                } else if (input.equalsIgnoreCase("list")) {
+                    printList();
+                } else if (input.startsWith("mark ")) {
+                    handleMarkMessage(input, true);
+                } else if (input.startsWith("unmark ")) {
+                    handleMarkMessage(input, false);
+                } else {
+                    addTask(input);
+                }
+            } catch (AlgoException e) {
+                printLine();
+                System.out.println(":( OH NO!!! " + e.getMessage());
+                printLine();
             }
         }
     }
@@ -60,11 +66,9 @@ public class Algo {
         printLine();
     }
 
-    private static void addTask(String input) {
+    private static void addTask(String input) throws AlgoException{
         if (taskCount == tasks.length) {
-            System.out.println("Task list is full");
-            printLine();
-            return;
+            throw new AlgoException("Task list is full.");
         }
         Task task = createTask(input);
         tasks[taskCount++] = task;
