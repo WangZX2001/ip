@@ -79,15 +79,11 @@ public class Algo {
         printLine();
     }
 
-    private static Task createTask(String input) {
-        if (input.startsWith("deadline ")) {
-            String content = input.substring("deadline ".length()).trim();
-            String[] parts = content.split(" /by ", 2);
+    private static Task createTask(String input) throws AlgoException {
+        String lower = input.toLowerCase();
 
-            String description = parts[0].trim();
-            String by = parts[1].trim();
-            return new Deadline(description, by);
-
+        if (lower.startsWith("deadline")) {
+            return createDeadline(input.substring("deadline".length()).trim());
         } else if (input.startsWith("todo ")) {
             String description = input.substring("todo ".length()).trim();
             return new Todo(description);
@@ -99,9 +95,31 @@ public class Algo {
             String from = parts[1].trim();
             String to = parts[2].trim();
             return new Event(description, from, to);
+        } else {
+            throw new AlgoException("Invalid command.");
         }
-        return new Task(input);
     }
+
+    private static Task createDeadline(String args) throws AlgoException {
+        if (args.isEmpty()) {
+            throw new AlgoException("Usage: deadline <description> /by <time>");
+        }
+
+        int byIndex = args.indexOf(" /by ");
+        if (byIndex == -1) {
+            throw new AlgoException("Usage: deadline <description> /by <time>");
+        }
+
+        String description = args.substring(0, byIndex).trim();
+        String by = args.substring(byIndex + " /by ".length()).trim();
+
+        if (description.isEmpty() || by.isEmpty()) {
+            throw new AlgoException("Usage: deadline <description> /by <time>");
+        }
+
+        return new Deadline(description, by);
+    }
+
 
     private static void printList() {
         printLine();
