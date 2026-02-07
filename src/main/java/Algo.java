@@ -34,15 +34,20 @@ public class Algo {
             try {
                 if (input.equalsIgnoreCase("bye")) {
                     break;
-                } else if (input.equalsIgnoreCase("list")) {
-                    printList();
-                } else if (input.startsWith("mark ")) {
-                    handleMarkMessage(input, true);
-                } else if (input.startsWith("unmark ")) {
-                    handleMarkMessage(input, false);
-                } else {
-                    addTask(input);
                 }
+                if (input.equalsIgnoreCase("list")) {
+                    printList();
+                    continue;
+                }
+                if (input.toLowerCase().startsWith("mark ")) {
+                    handleMarkMessage(input, true);
+                    continue;
+                }
+                if (input.toLowerCase().startsWith("unmark ")) {
+                    handleMarkMessage(input, false);
+                    continue;
+                }
+                addTask(input);
             } catch (AlgoException e) {
                 printLine();
                 System.out.println(":( OH NO!!! " + e.getMessage());
@@ -161,17 +166,16 @@ public class Algo {
         printLine();
     }
 
-    private static void handleMarkMessage(String input, boolean isMarkedAsDone) {
+    private static void handleMarkMessage(String input, boolean isMarkedAsDone) throws AlgoException {
 
         String prefix = isMarkedAsDone ? "mark " : "unmark ";
         String numberPart = input.substring(prefix.length()).trim();
 
         //Edge case 1: Number is missing
         if (numberPart.isEmpty()) {
-            System.out.println("Please specify a task number.");
-            printLine();
-            return;
+            throw new AlgoException("Please specify a task number.");
         }
+
 
         int index = Integer.parseInt(numberPart) - 1;
         //Edge case 2: not a positive number or out of range
