@@ -90,18 +90,18 @@ public class Algo {
         String lower = input.toLowerCase();
 
         if (lower.startsWith("deadline")) {
-            return createDeadline(input.substring("deadline".length()).trim());
+            return getDeadline(input.substring("deadline".length()).trim());
         }
         if (lower.startsWith("todo")) {
-            return createTodo(input.substring("todo".length()).trim());
+            return getTodo(input.substring("todo".length()).trim());
         }
-        if (input.startsWith("event")) {
-            return createEvent(input.substring("event".length()).trim());
+        if (lower.startsWith("event")) {
+            return getEvent(input.substring("event".length()).trim());
         }
         throw new AlgoException("Invalid command.");
     }
 
-    private static Event createEvent(String args) throws AlgoException {
+    private static Event getEvent(String args) throws AlgoException {
         if (args.isEmpty()) {
             throw new AlgoException("The description of an event cannot be empty.\n" +
                     "An event must include '/from <start>' and '/to <end>'.");
@@ -125,7 +125,7 @@ public class Algo {
         return new Event(description, from, to);
     }
 
-    private static Task createTodo(String args) throws AlgoException {
+    private static Task getTodo(String args) throws AlgoException {
         if (args.isEmpty()) {
             throw new AlgoException("The description of a todo cannot be empty.\n" +
                     "Usage: todo <description>");
@@ -133,7 +133,7 @@ public class Algo {
         return new Todo(args);
     }
 
-    private static Task createDeadline(String args) throws AlgoException {
+    private static Task getDeadline(String args) throws AlgoException {
         if (args.isEmpty()) {
             throw new AlgoException("Usage: deadline <description> /by <time>");
         }
@@ -175,14 +175,16 @@ public class Algo {
         if (numberPart.isEmpty()) {
             throw new AlgoException("Please specify a task number.");
         }
+        int index;
+        try {
+            index = Integer.parseInt(numberPart) - 1;
+        } catch (NumberFormatException e) {
+            throw new AlgoException("Task number must be a number.");
+        }
 
-
-        int index = Integer.parseInt(numberPart) - 1;
         //Edge case 2: not a positive number or out of range
         if (index < 0 || index >= taskCount) {
-            System.out.println("Invalid task number.");
-            printLine();
-            return;
+            throw new AlgoException("Invalid task number.");
         }
 
         Task t = tasks[index];
