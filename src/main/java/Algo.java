@@ -84,9 +84,9 @@ public class Algo {
 
         if (lower.startsWith("deadline")) {
             return createDeadline(input.substring("deadline".length()).trim());
-        } else if (input.startsWith("todo ")) {
-            String description = input.substring("todo ".length()).trim();
-            return new Todo(description);
+        }
+        if (lower.startsWith("todo")) {
+            return createTodo(input.substring("todo".length()).trim());
         } else if (input.startsWith("event ")) {
             String content = input.substring("event ".length()).trim();
             String[] parts = content.split("/from | /to", 3);
@@ -98,6 +98,14 @@ public class Algo {
         } else {
             throw new AlgoException("Invalid command.");
         }
+    }
+
+    private static Task createTodo(String args) throws AlgoException {
+        if (args.isEmpty()) {
+            throw new AlgoException("The description of a todo cannot be empty.\n" +
+                    "Usage: todo <description>");
+        }
+        return new Todo(args);
     }
 
     private static Task createDeadline(String args) throws AlgoException {
