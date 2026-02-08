@@ -1,4 +1,4 @@
-package algo;
+package algo.task;
 
 public class Event extends Task {
 
