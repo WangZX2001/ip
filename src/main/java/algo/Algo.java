@@ -55,6 +55,10 @@ public class Algo {
                     handleMarkMessage(input, false);
                     continue;
                 }
+                if (lower.equals("delete") || lower.startsWith("delete ")) {
+                    handleDeleteMessage(input);
+                    continue;
+                };
                 addTask(input);
             } catch (AlgoException e) {
                 printLine();
@@ -195,6 +199,26 @@ public class Algo {
             System.out.println("OK, I've marked this task as not done yet:");
         }
         System.out.println(t);
+        printLine();
+    }
+
+    private static void handleDeleteMessage(String input) throws AlgoException {
+        String numberPart = input.substring("delete".length()).trim();
+        int index = parseTaskIndex(numberPart);
+
+        Task removed = tasks[index];
+
+        for (int i = index; i < taskCount - 1; i++) {
+            tasks[i] = tasks[i + 1];
+        }
+
+        tasks[taskCount - 1] = null;
+        taskCount--;
+
+        printLine();
+        System.out.println("Noted. I've removed this task:");
+        System.out.println("  " + removed);
+        System.out.println("Now you have " + taskCount + " tasks in the list.");
         printLine();
     }
 
