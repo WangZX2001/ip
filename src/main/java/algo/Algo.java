@@ -112,7 +112,7 @@ public class Algo {
         }
         throw new AlgoException(
                 "Invalid command. Try:\n" +
-                        "todo, deadline, event, mark, unmark, list, bye"
+                        "todo, deadline, event, mark, unmark, list, bye, delete"
         );
 
     }
