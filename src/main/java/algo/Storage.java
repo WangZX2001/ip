@@ -66,6 +66,8 @@ public class Storage {
             return loaded;
         }
 
+        int corruptedCount = 0;
+
         try {
             List<String> lines = Files.readAllLines(FILE_PATH);
 
@@ -78,12 +80,18 @@ public class Storage {
                 try {
                     loaded.add(parseTaskLine(line));
                 } catch (Exception corruptedLine) {
-                    // Implement skip corrupted lines
+                    corruptedCount++;
                 }
             }
 
         } catch (IOException e) {
-            // If file cannot be read, just start empty
+            System.out.println("Warning: Could not read save file: " + FILE_PATH);
+        }
+
+        if (corruptedCount > 0) {
+            System.out.println("Warning: Skipped "
+                    + corruptedCount
+                    + " corrupted line(s) in save file.");
         }
 
         return loaded;
@@ -103,31 +111,23 @@ public class Storage {
 
         boolean isDone = "1".equals(doneStr);
 
-        Task t;
-
-        switch (type) {
-
-        case "T":
-            t = new Todo(desc);
-            break;
-
-        case "D":
-            if (parts.length < 4) {
-                throw new RuntimeException("Corrupted deadline");
+        Task t = switch (type) {
+            case "T" -> new Todo(desc);
+            case "D" -> {
+                if (parts.length < 4) {
+                    throw new RuntimeException("Corrupted deadline");
+                }
+                yield new Deadline(desc, parts[3].trim());
             }
-            t = new Deadline(desc, parts[3].trim());
-            break;
-
-        case "E":
-            if (parts.length < 5) {
-                throw new RuntimeException("Corrupted event");
+            case "E" -> {
+                if (parts.length < 5) {
+                    throw new RuntimeException("Corrupted event");
+                }
+                yield new Event(desc, parts[3].trim(), parts[4].trim());
             }
-            t = new Event(desc, parts[3].trim(), parts[4].trim());
-            break;
+            default -> throw new RuntimeException("Unknown task type");
+        };
 
-        default:
-            throw new RuntimeException("Unknown task type");
-        }
         t.setDone(isDone);
         return t;
     }
