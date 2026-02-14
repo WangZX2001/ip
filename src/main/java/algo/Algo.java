@@ -5,6 +5,7 @@ import algo.task.Event;
 import algo.task.Task;
 import algo.task.Todo;
 
+import java.util.List;
 import java.util.Scanner;
 
 public class Algo {
@@ -22,10 +23,19 @@ public class Algo {
     public static final int MAX_NUMBER_OF_TASKS = 100;
     private static final Task[] tasks = new Task[MAX_NUMBER_OF_TASKS];
     private static int taskCount = 0;
+    private static final Storage storage = new Storage();
 
 
     public static void main(String[] args) {
         Scanner in = new Scanner(System.in);
+
+        List<Task> loaded = storage.load();
+        for (Task t : loaded) {
+            if (taskCount >= tasks.length) {
+                break;
+            }
+            tasks[taskCount++] = t;
+        }
 
         printGreeting();
         executeCommand(in);
