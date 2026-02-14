@@ -97,6 +97,7 @@ public class Algo {
         }
         Task task = createTask(input);
         tasks[taskCount++] = task;
+        storage.save(tasks, taskCount);
         printLine();
         System.out.println("Got it. I've added this task:");
         System.out.println(task);
@@ -196,6 +197,7 @@ public class Algo {
         int index = parseTaskIndex(numberPart);
         Task t = tasks[index];
         t.setDone(isMarkedAsDone);
+        storage.save(tasks, taskCount);
 
         printLine();
 
