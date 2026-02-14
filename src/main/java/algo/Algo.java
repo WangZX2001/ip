@@ -42,29 +42,51 @@ public class Algo {
                 if (input.equalsIgnoreCase("bye")) {
                     break;
                 }
-                if (input.equalsIgnoreCase("list")) {
+
+                //extract out the command and the argument
+                int spaceIndex = lower.indexOf(" ");
+                String command = (spaceIndex == -1) ? lower : lower.substring(0, spaceIndex);
+                String args = (spaceIndex == -1) ? "" : input.substring(spaceIndex + 1).trim();
+
+                switch (command) {
+                case "list":
                     printList();
-                    continue;
+                    break;
+
+                case "mark":
+                    handleMarkMessage(args, true);
+                    break;
+
+                case "unmark":
+                    handleMarkMessage(args, false);
+                    break;
+
+                case "delete":
+                    handleDeleteMessage(args);
+                    break;
+
+                case "todo":
+                case "deadline":
+                case "event":
+                    addTask(input);
+                    break;
+
+                default:
+                    throw new AlgoException(
+                            "Invalid command. Try:\n" +
+                                    "todo, deadline, event, mark, unmark, list, bye, delete"
+                    );
                 }
-                if (lower.equals("mark") || lower.startsWith("mark ")) {
-                    handleMarkMessage(input, true);
-                    continue;
-                }
-                if (lower.equals("unmark") || lower.startsWith("unmark ")) {
-                    handleMarkMessage(input, false);
-                    continue;
-                }
-                if (lower.equals("delete") || lower.startsWith("delete ")) {
-                    handleDeleteMessage(input);
-                    continue;
-                }
-                addTask(input);
             } catch (AlgoException e) {
-                printLine();
-                System.out.println(":( OH NO!!! " + e.getMessage());
-                printLine();
+                printError(e.getMessage());
             }
         }
+    }
+
+    private static void printError(String message) {
+        printLine();
+        System.out.println(":( OH NO!!! " + message);
+        printLine();
     }
 
     private static void printLine() {
@@ -178,30 +200,23 @@ public class Algo {
         printLine();
     }
 
-    private static void handleMarkMessage(String input, boolean isMarkedAsDone) throws AlgoException {
-
-        String prefix = isMarkedAsDone ? "mark" : "unmark";
-        String numberPart = input.substring(prefix.length()).trim();
-
-        int index = parseTaskIndex(numberPart);
+    private static void handleMarkMessage(String args, boolean isMarkedAsDone) throws AlgoException {
+        int index = parseTaskIndex(args);
         Task t = tasks.get(index);
         t.setDone(isMarkedAsDone);
 
         printLine();
-
-        if (isMarkedAsDone) {
-            System.out.println("Nice! I've marked this task as done:");
-        } else {
-            System.out.println("OK, I've marked this task as not done yet:");
-        }
+        System.out.println(isMarkedAsDone
+                ? "Nice! I've marked this task as done:"
+                : "OK, I've marked this task as not done yet:");
         System.out.println(t);
         printLine();
     }
 
-    private static void handleDeleteMessage(String input) throws AlgoException {
-        String numberPart = input.substring("delete".length()).trim();
-        int index = parseTaskIndex(numberPart);
+    private static void handleDeleteMessage(String args) throws AlgoException {
+        int index = parseTaskIndex(args);
         Task removed = tasks.remove(index);
+
         printLine();
         System.out.println("Noted. I've removed this task:");
         System.out.println("  " + removed);
