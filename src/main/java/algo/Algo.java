@@ -6,6 +6,7 @@ import algo.task.Task;
 import algo.task.Todo;
 
 import java.util.Scanner;
+import java.util.ArrayList;
 
 public class Algo {
 
@@ -19,9 +20,7 @@ public class Algo {
                     |  _  | | |___| |_| || |_| |
                     |_| |_| |_____\\____/  \\___/
                     """;
-    public static final int MAX_NUMBER_OF_TASKS = 100;
-    private static final Task[] tasks = new Task[MAX_NUMBER_OF_TASKS];
-    private static int taskCount = 0;
+    private static final ArrayList<Task> tasks = new ArrayList<>();
 
 
     public static void main(String[] args) {
@@ -86,15 +85,12 @@ public class Algo {
     }
 
     private static void addTask(String input) throws AlgoException {
-        if (taskCount == tasks.length) {
-            throw new AlgoException("Task list is full.");
-        }
         Task task = createTask(input);
-        tasks[taskCount++] = task;
+        tasks.add(task);
         printLine();
         System.out.println("Got it. I've added this task:");
         System.out.println(task);
-        System.out.println("Now you have " + taskCount + " tasks in the list.");
+        System.out.println("Now you have " + tasks.size() + " tasks in the list.");
         printLine();
     }
 
@@ -171,12 +167,12 @@ public class Algo {
 
     private static void printList() {
         printLine();
-        if (taskCount == 0) {
+        if (tasks.isEmpty()) {
             System.out.println("No tasks yet");
         } else {
             System.out.println("Here are the tasks in your list:");
-            for (int i = 0; i < taskCount; i++) {
-                System.out.println((i + 1) + "." + tasks[i]);
+            for (int i = 0; i < tasks.size(); i++) {
+                System.out.println((i + 1) + "." + tasks.get(i));
             }
         }
         printLine();
@@ -188,7 +184,7 @@ public class Algo {
         String numberPart = input.substring(prefix.length()).trim();
 
         int index = parseTaskIndex(numberPart);
-        Task t = tasks[index];
+        Task t = tasks.get(index);
         t.setDone(isMarkedAsDone);
 
         printLine();
@@ -206,19 +202,15 @@ public class Algo {
         String numberPart = input.substring("delete".length()).trim();
         int index = parseTaskIndex(numberPart);
 
-        Task removed = tasks[index];
+        Task removed = tasks.get(index);
 
-        for (int i = index; i < taskCount - 1; i++) {
-            tasks[i] = tasks[i + 1];
-        }
+        tasks.remove(index);
 
-        tasks[taskCount - 1] = null;
-        taskCount--;
 
         printLine();
         System.out.println("Noted. I've removed this task:");
         System.out.println("  " + removed);
-        System.out.println("Now you have " + taskCount + " tasks in the list.");
+        System.out.println("Now you have " + tasks.size() + " tasks in the list.");
         printLine();
     }
 
@@ -234,7 +226,7 @@ public class Algo {
         }
 
         //Edge case 2: not a positive number or out of range
-        if (index < 0 || index >= taskCount) {
+        if (index < 0 || index >= tasks.size()) {
             throw new AlgoException("Invalid task number.");
         }
         return index;
