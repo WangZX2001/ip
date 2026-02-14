@@ -1,0 +1,3 @@
+T | 0 | cut hair
+T | 1 | take notes
+T | 0 | brush teeth
