@@ -57,7 +57,7 @@ public class Algo {
                 if (lower.equals("delete") || lower.startsWith("delete ")) {
                     handleDeleteMessage(input);
                     continue;
-                };
+                }
                 addTask(input);
             } catch (AlgoException e) {
                 printLine();
@@ -201,12 +201,7 @@ public class Algo {
     private static void handleDeleteMessage(String input) throws AlgoException {
         String numberPart = input.substring("delete".length()).trim();
         int index = parseTaskIndex(numberPart);
-
-        Task removed = tasks.get(index);
-
-        tasks.remove(index);
-
-
+        Task removed = tasks.remove(index);
         printLine();
         System.out.println("Noted. I've removed this task:");
         System.out.println("  " + removed);
