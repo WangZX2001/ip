@@ -222,7 +222,7 @@ public class Algo {
     private static void handleDeleteMessage(String args) throws AlgoException {
         int index = parseTaskIndex(args);
         Task removed = tasks.remove(index);
-
+        storage.save(tasks);
         printLine();
         System.out.println("Noted. I've removed this task:");
         System.out.println("  " + removed);
