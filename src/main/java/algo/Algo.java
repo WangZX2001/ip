@@ -5,6 +5,7 @@ import algo.task.Event;
 import algo.task.Task;
 import algo.task.Todo;
 
+import java.util.List;
 import java.util.Scanner;
 import java.util.ArrayList;
 
@@ -20,16 +21,19 @@ public class Algo {
                     |  _  | | |___| |_| || |_| |
                     |_| |_| |_____\\____/  \\___/
                     """;
+
     private static final ArrayList<Task> tasks = new ArrayList<>();
+    private static final Storage storage = new Storage();
 
 
     public static void main(String[] args) {
         Scanner in = new Scanner(System.in);
 
+        List<Task> loaded = storage.load();
+        tasks.addAll(loaded);
         printGreeting();
         executeCommand(in);
         printByeMessage();
-
         in.close();
     }
 
@@ -109,6 +113,7 @@ public class Algo {
     private static void addTask(String input) throws AlgoException {
         Task task = createTask(input);
         tasks.add(task);
+        storage.save(tasks);
         printLine();
         System.out.println("Got it. I've added this task:");
         System.out.println(task);
@@ -204,6 +209,7 @@ public class Algo {
         int index = parseTaskIndex(args);
         Task t = tasks.get(index);
         t.setDone(isMarkedAsDone);
+        storage.save(tasks);
 
         printLine();
         System.out.println(isMarkedAsDone

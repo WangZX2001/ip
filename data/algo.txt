@@ -1,0 +1,8 @@
+T | 0 | cut hair
+T | 1 | take notes
+T | 0 | brush teeth
+T | 0 | what
+T | 0 | awd
+T | 0 | shem
+T | 0 | 1
+T | 0 | 2
