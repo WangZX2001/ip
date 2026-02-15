@@ -6,6 +6,7 @@ import algo.task.Task;
 import algo.task.Todo;
 
 import java.util.Scanner;
+import java.util.ArrayList;
 
 public class Algo {
 
@@ -19,9 +20,7 @@ public class Algo {
                     |  _  | | |___| |_| || |_| |
                     |_| |_| |_____\\____/  \\___/
                     """;
-    public static final int MAX_NUMBER_OF_TASKS = 100;
-    private static final Task[] tasks = new Task[MAX_NUMBER_OF_TASKS];
-    private static int taskCount = 0;
+    private static final ArrayList<Task> tasks = new ArrayList<>();
 
 
     public static void main(String[] args) {
@@ -43,25 +42,51 @@ public class Algo {
                 if (input.equalsIgnoreCase("bye")) {
                     break;
                 }
-                if (input.equalsIgnoreCase("list")) {
+
+                //extract out the command and the argument
+                int spaceIndex = lower.indexOf(" ");
+                String command = (spaceIndex == -1) ? lower : lower.substring(0, spaceIndex);
+                String args = (spaceIndex == -1) ? "" : input.substring(spaceIndex + 1).trim();
+
+                switch (command) {
+                case "list":
                     printList();
-                    continue;
+                    break;
+
+                case "mark":
+                    handleMarkMessage(args, true);
+                    break;
+
+                case "unmark":
+                    handleMarkMessage(args, false);
+                    break;
+
+                case "delete":
+                    handleDeleteMessage(args);
+                    break;
+
+                case "todo":
+                case "deadline":
+                case "event":
+                    addTask(input);
+                    break;
+
+                default:
+                    throw new AlgoException(
+                            "Invalid command. Try:\n" +
+                                    "todo, deadline, event, mark, unmark, list, bye, delete"
+                    );
                 }
-                if (lower.equals("mark") || lower.startsWith("mark ")) {
-                    handleMarkMessage(input, true);
-                    continue;
-                }
-                if (lower.equals("unmark") || lower.startsWith("unmark ")) {
-                    handleMarkMessage(input, false);
-                    continue;
-                }
-                addTask(input);
             } catch (AlgoException e) {
-                printLine();
-                System.out.println(":( OH NO!!! " + e.getMessage());
-                printLine();
+                printError(e.getMessage());
             }
         }
+    }
+
+    private static void printError(String message) {
+        printLine();
+        System.out.println(":( OH NO!!! " + message);
+        printLine();
     }
 
     private static void printLine() {
@@ -82,15 +107,12 @@ public class Algo {
     }
 
     private static void addTask(String input) throws AlgoException {
-        if (taskCount == tasks.length) {
-            throw new AlgoException("Task list is full.");
-        }
         Task task = createTask(input);
-        tasks[taskCount++] = task;
+        tasks.add(task);
         printLine();
         System.out.println("Got it. I've added this task:");
         System.out.println(task);
-        System.out.println("Now you have " + taskCount + " tasks in the list.");
+        System.out.println("Now you have " + tasks.size() + " tasks in the list.");
         printLine();
     }
 
@@ -108,7 +130,7 @@ public class Algo {
         }
         throw new AlgoException(
                 "Invalid command. Try:\n" +
-                        "todo, deadline, event, mark, unmark, list, bye"
+                        "todo, deadline, event, mark, unmark, list, bye, delete"
         );
 
     }
@@ -167,34 +189,38 @@ public class Algo {
 
     private static void printList() {
         printLine();
-        if (taskCount == 0) {
+        if (tasks.isEmpty()) {
             System.out.println("No tasks yet");
         } else {
             System.out.println("Here are the tasks in your list:");
-            for (int i = 0; i < taskCount; i++) {
-                System.out.println((i + 1) + "." + tasks[i]);
+            for (int i = 0; i < tasks.size(); i++) {
+                System.out.println((i + 1) + "." + tasks.get(i));
             }
         }
         printLine();
     }
 
-    private static void handleMarkMessage(String input, boolean isMarkedAsDone) throws AlgoException {
-
-        String prefix = isMarkedAsDone ? "mark" : "unmark";
-        String numberPart = input.substring(prefix.length()).trim();
-
-        int index = parseTaskIndex(numberPart);
-        Task t = tasks[index];
+    private static void handleMarkMessage(String args, boolean isMarkedAsDone) throws AlgoException {
+        int index = parseTaskIndex(args);
+        Task t = tasks.get(index);
         t.setDone(isMarkedAsDone);
 
         printLine();
-
-        if (isMarkedAsDone) {
-            System.out.println("Nice! I've marked this task as done:");
-        } else {
-            System.out.println("OK, I've marked this task as not done yet:");
-        }
+        System.out.println(isMarkedAsDone
+                ? "Nice! I've marked this task as done:"
+                : "OK, I've marked this task as not done yet:");
         System.out.println(t);
+        printLine();
+    }
+
+    private static void handleDeleteMessage(String args) throws AlgoException {
+        int index = parseTaskIndex(args);
+        Task removed = tasks.remove(index);
+
+        printLine();
+        System.out.println("Noted. I've removed this task:");
+        System.out.println("  " + removed);
+        System.out.println("Now you have " + tasks.size() + " tasks in the list.");
         printLine();
     }
 
@@ -210,7 +236,7 @@ public class Algo {
         }
 
         //Edge case 2: not a positive number or out of range
-        if (index < 0 || index >= taskCount) {
+        if (index < 0 || index >= tasks.size()) {
             throw new AlgoException("Invalid task number.");
         }
         return index;
