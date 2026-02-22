@@ -11,14 +11,18 @@ import java.util.ArrayList;
 public class Algo {
 
     private static final ArrayList<Task> tasks = new ArrayList<>();
-    private static final Storage storage = new Storage();
+    private static final String FILE_PATH = "data/algo.txt";
+    private static final Storage storage = new Storage(FILE_PATH);
 
 
     public static void main(String[] args) {
         Ui ui = new Ui();
-
-        List<Task> loaded = storage.load();
-        tasks.addAll(loaded);
+        try {
+            List<Task> loaded = storage.load();
+            tasks.addAll(loaded);
+        } catch (AlgoException e) {
+            ui.showLoadingError();
+        }
         ui.showWelcomeMessage();
         executeCommand(ui);
         ui.showByeMessage();
