@@ -36,13 +36,10 @@ public class Ui {
 
     public void showByeMessage() {
         System.out.println("Bye. Hope to see you again soon!");
-        printLine();
     }
 
     public void showErrorMessage(String message) {
-        printLine();
         System.out.println(":( OH NO!!! " + message);
-        printLine();
     }
 
     public void printLine() {
@@ -51,5 +48,13 @@ public class Ui {
 
     public void showLoadingError() {
         System.out.println("Warning: Could not load tasks from storage.");
+    }
+
+    public void showWelcome() {
+        showWelcomeMessage();
+    }
+
+    public void showError(String message) {
+        showErrorMessage(message);
     }
 }

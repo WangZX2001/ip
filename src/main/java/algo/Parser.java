@@ -25,8 +25,8 @@ public class Parser {
     private static final String INDEX_RANGE_ERROR =
             "Invalid task number.";
 
-    public static ParsedCommand parseCommand(String input) {
-        String trimmed = input.trim();
+    public static Command parse(String fullCommand) throws AlgoException {
+        String trimmed = fullCommand.trim();
         String lower = trimmed.toLowerCase();
 
         int spaceIndex = lower.indexOf(" ");
@@ -38,7 +38,15 @@ public class Parser {
                 ? ""
                 : trimmed.substring(spaceIndex + 1).trim();
 
-        return new ParsedCommand(command, args, trimmed);
+        return switch (command) {
+            case "bye" -> new ByeCommand();
+            case "list" -> new ListCommand();
+            case "todo", "deadline", "event" -> new AddCommand(trimmed);
+            case "mark" -> new MarkCommand(args);
+            case "unmark" -> new UnmarkCommand(args);
+            case "delete" -> new DeleteCommand(args);
+            default -> throw new AlgoException("Invalid command.");
+        };
     }
 
     public static Task parseTask(String fullInput) throws AlgoException {
