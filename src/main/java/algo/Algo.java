@@ -2,11 +2,10 @@ package algo;
 
 import algo.task.Task;
 import java.util.List;
-import java.util.ArrayList;
 
 public class Algo {
 
-    private static final ArrayList<Task> tasks = new ArrayList<>();
+    private static TaskList tasks;
     private static final String FILE_PATH = "data/algo.txt";
     private static final Storage storage = new Storage(FILE_PATH);
 
@@ -15,9 +14,10 @@ public class Algo {
         Ui ui = new Ui();
         try {
             List<Task> loaded = storage.load();
-            tasks.addAll(loaded);
+            tasks = new TaskList(loaded);
         } catch (AlgoException e) {
             ui.showLoadingError();
+            tasks = new TaskList();
         }
         ui.showWelcomeMessage();
         executeCommand(ui);
@@ -76,7 +76,7 @@ public class Algo {
     private static void addTask(Ui ui, String input) throws AlgoException {
         Task task = Parser.parseTask(input);
         tasks.add(task);
-        storage.save(tasks);
+        storage.save(tasks.getAll());
         ui.printLine();
         System.out.println("Got it. I've added this task:");
         System.out.println(task);
@@ -101,7 +101,7 @@ public class Algo {
         int index = Parser.parseIndex(indexArg, tasks.size());
         Task t = tasks.get(index);
         t.setDone(isDone);
-        storage.save(tasks);
+        storage.save(tasks.getAll());
 
         ui.printLine();
         System.out.println(isDone
@@ -113,8 +113,8 @@ public class Algo {
 
     private static void deleteTask(Ui ui, String indexArg) throws AlgoException {
         int index = Parser.parseIndex(indexArg, tasks.size());
-        Task removed = tasks.remove(index);
-        storage.save(tasks);
+        Task removed = tasks.delete(index);
+        storage.save(tasks.getAll());
         ui.printLine();
         System.out.println("Noted. I've removed this task:");
         System.out.println("  " + removed);
