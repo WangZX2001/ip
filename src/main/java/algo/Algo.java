@@ -1,5 +1,7 @@
 package algo;
 
+import algo.command.Command;
+
 public class Algo {
 
     private final Storage storage;

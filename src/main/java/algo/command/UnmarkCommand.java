@@ -1,15 +1,20 @@
-package algo;
+package algo.command;
 
-public class DeleteCommand extends Command {
+import algo.AlgoException;
+import algo.Storage;
+import algo.TaskList;
+import algo.Ui;
+
+public class UnmarkCommand extends Command {
     private final String indexArg;
 
-    public DeleteCommand(String indexArg) {
+    public UnmarkCommand(String indexArg) {
         this.indexArg = indexArg;
     }
 
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) throws AlgoException {
-        String msg = tasks.deleteTask(indexArg);
+        String msg = tasks.setDone(indexArg, false);
         storage.save(tasks.getAll());
         System.out.println(msg);
     }

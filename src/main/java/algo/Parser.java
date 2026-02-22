@@ -1,5 +1,11 @@
 package algo;
 
+import algo.command.AddCommand;
+import algo.command.Command;
+import algo.command.DeleteCommand;
+import algo.command.ListCommand;
+import algo.command.MarkCommand;
+import algo.command.UnmarkCommand;
 import algo.task.Deadline;
 import algo.task.Event;
 import algo.task.Task;
@@ -39,7 +45,7 @@ public class Parser {
                 : trimmed.substring(spaceIndex + 1).trim();
 
         return switch (command) {
-            case "bye" -> new ByeCommand();
+            case "bye" -> new AddCommand.ByeCommand();
             case "list" -> new ListCommand();
             case "todo", "deadline", "event" -> new AddCommand(trimmed);
             case "mark" -> new MarkCommand(args);

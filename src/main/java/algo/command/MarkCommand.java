@@ -1,4 +1,9 @@
-package algo;
+package algo.command;
+
+import algo.AlgoException;
+import algo.Storage;
+import algo.TaskList;
+import algo.Ui;
 
 public class MarkCommand extends Command {
     private final String indexArg;
