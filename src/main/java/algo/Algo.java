@@ -6,40 +6,28 @@ import algo.task.Task;
 import algo.task.Todo;
 
 import java.util.List;
-import java.util.Scanner;
 import java.util.ArrayList;
 
 public class Algo {
-
-    private static final String BOT_NAME = "ALGO";
-    private static final String LINE = "________________________________________________________";
-    private static final String LOGO =
-            """
-                      ___    _      ____   ___
-                     / _ \\  | |    / ___| / _ \\
-                    / /_\\ \\ | |   | |  _ | | | |
-                    |  _  | | |___| |_| || |_| |
-                    |_| |_| |_____\\____/  \\___/
-                    """;
 
     private static final ArrayList<Task> tasks = new ArrayList<>();
     private static final Storage storage = new Storage();
 
 
     public static void main(String[] args) {
-        Scanner in = new Scanner(System.in);
+        Ui ui = new Ui();
 
         List<Task> loaded = storage.load();
         tasks.addAll(loaded);
-        printGreeting();
-        executeCommand(in);
-        printByeMessage();
-        in.close();
+        ui.showWelcomeMessage();
+        executeCommand(ui);
+        ui.showByeMessage();
+        ui.close();
     }
 
-    private static void executeCommand(Scanner in) {
-        while (in.hasNextLine()) {
-            String input = in.nextLine().trim();
+    private static void executeCommand(Ui ui) {
+        while (true) {
+            String input = ui.readCommand();   // already trimmed
             String lower = input.toLowerCase();
 
             try {
@@ -54,25 +42,25 @@ public class Algo {
 
                 switch (command) {
                 case "list":
-                    printList();
+                    printList(ui);
                     break;
 
                 case "mark":
-                    handleMarkMessage(args, true);
+                    handleMarkMessage(ui, args, true);
                     break;
 
                 case "unmark":
-                    handleMarkMessage(args, false);
+                    handleMarkMessage(ui, args, false);
                     break;
 
                 case "delete":
-                    handleDeleteMessage(args);
+                    handleDeleteMessage(ui, args);
                     break;
 
                 case "todo":
                 case "deadline":
                 case "event":
-                    addTask(input);
+                    addTask(ui, input);
                     break;
 
                 default:
@@ -82,43 +70,20 @@ public class Algo {
                     );
                 }
             } catch (AlgoException e) {
-                printError(e.getMessage());
+                ui.showErrorMessage(e.getMessage());
             }
         }
     }
 
-    private static void printError(String message) {
-        printLine();
-        System.out.println(":( OH NO!!! " + message);
-        printLine();
-    }
-
-    private static void printLine() {
-        System.out.println(LINE);
-    }
-
-    private static void printGreeting() {
-        printLine();
-        System.out.println(LOGO);
-        System.out.println("Hello! I'm " + BOT_NAME);
-        System.out.println("What can I do for you?");
-        printLine();
-    }
-
-    private static void printByeMessage() {
-        System.out.println("Bye. Hope to see you again soon!");
-        printLine();
-    }
-
-    private static void addTask(String input) throws AlgoException {
+    private static void addTask(Ui ui, String input) throws AlgoException {
         Task task = createTask(input);
         tasks.add(task);
         storage.save(tasks);
-        printLine();
+        ui.printLine();
         System.out.println("Got it. I've added this task:");
         System.out.println(task);
         System.out.println("Now you have " + tasks.size() + " tasks in the list.");
-        printLine();
+        ui.printLine();
     }
 
     private static Task createTask(String input) throws AlgoException {
@@ -192,8 +157,8 @@ public class Algo {
         return new Deadline(description, by);
     }
 
-    private static void printList() {
-        printLine();
+    private static void printList(Ui ui) {
+        ui.printLine();
         if (tasks.isEmpty()) {
             System.out.println("No tasks yet");
         } else {
@@ -202,32 +167,32 @@ public class Algo {
                 System.out.println((i + 1) + "." + tasks.get(i));
             }
         }
-        printLine();
+        ui.printLine();
     }
 
-    private static void handleMarkMessage(String args, boolean isMarkedAsDone) throws AlgoException {
+    private static void handleMarkMessage(Ui ui, String args, boolean isMarkedAsDone) throws AlgoException {
         int index = parseTaskIndex(args);
         Task t = tasks.get(index);
         t.setDone(isMarkedAsDone);
         storage.save(tasks);
 
-        printLine();
+        ui.printLine();
         System.out.println(isMarkedAsDone
                 ? "Nice! I've marked this task as done:"
                 : "OK, I've marked this task as not done yet:");
         System.out.println(t);
-        printLine();
+        ui.printLine();
     }
 
-    private static void handleDeleteMessage(String args) throws AlgoException {
+    private static void handleDeleteMessage(Ui ui, String args) throws AlgoException {
         int index = parseTaskIndex(args);
         Task removed = tasks.remove(index);
         storage.save(tasks);
-        printLine();
+        ui.printLine();
         System.out.println("Noted. I've removed this task:");
         System.out.println("  " + removed);
         System.out.println("Now you have " + tasks.size() + " tasks in the list.");
-        printLine();
+        ui.printLine();
     }
 
     private static int parseTaskIndex(String numberPart) throws AlgoException {
