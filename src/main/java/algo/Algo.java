@@ -45,54 +45,22 @@ public class Algo {
                 case "todo":
                 case "deadline":
                 case "event": {
-                    Task task = Parser.parseTask(parsed.fullInput);
-                    tasks.add(task);
-                    storage.save(tasks);
-
-                    ui.printLine();
-                    System.out.println("Got it. I've added this task:");
-                    System.out.println(task);
-                    System.out.println("Now you have " + tasks.size() + " tasks in the list.");
-                    ui.printLine();
+                    addTask(ui, parsed.fullInput);
                     break;
                 }
 
                 case "mark": {
-                    int index = Parser.parseIndex(parsed.args, tasks.size());
-                    Task t = tasks.get(index);
-                    t.setDone(true);
-                    storage.save(tasks);
-
-                    ui.printLine();
-                    System.out.println("Nice! I've marked this task as done:");
-                    System.out.println(t);
-                    ui.printLine();
+                    setDone(ui, parsed.args, true);
                     break;
                 }
 
                 case "unmark": {
-                    int index = Parser.parseIndex(parsed.args, tasks.size());
-                    Task t = tasks.get(index);
-                    t.setDone(false);
-                    storage.save(tasks);
-
-                    ui.printLine();
-                    System.out.println("OK, I've marked this task as not done yet:");
-                    System.out.println(t);
-                    ui.printLine();
+                    setDone(ui, parsed.args, false);
                     break;
                 }
 
                 case "delete": {
-                    int index = Parser.parseIndex(parsed.args, tasks.size());
-                    Task removed = tasks.remove(index);
-                    storage.save(tasks);
-
-                    ui.printLine();
-                    System.out.println("Noted. I've removed this task:");
-                    System.out.println("  " + removed);
-                    System.out.println("Now you have " + tasks.size() + " tasks in the list.");
-                    ui.printLine();
+                    deleteTask(ui, parsed.args);
                     break;
                 }
 
@@ -107,7 +75,7 @@ public class Algo {
     }
 
     private static void addTask(Ui ui, String input) throws AlgoException {
-        Task task = createTask(input);
+        Task task = Parser.parseTask(input);
         tasks.add(task);
         storage.save(tasks);
         ui.printLine();
@@ -115,77 +83,6 @@ public class Algo {
         System.out.println(task);
         System.out.println("Now you have " + tasks.size() + " tasks in the list.");
         ui.printLine();
-    }
-
-    private static Task createTask(String input) throws AlgoException {
-        String lower = input.toLowerCase();
-
-        if (lower.startsWith("deadline")) {
-            return getDeadline(input.substring("deadline".length()).trim());
-        }
-        if (lower.startsWith("todo")) {
-            return getTodo(input.substring("todo".length()).trim());
-        }
-        if (lower.startsWith("event")) {
-            return getEvent(input.substring("event".length()).trim());
-        }
-        throw new AlgoException(
-                "Invalid command. Try:\n" +
-                        "todo, deadline, event, mark, unmark, list, bye, delete"
-        );
-
-    }
-
-    private static Event getEvent(String args) throws AlgoException {
-        if (args.isEmpty()) {
-            throw new AlgoException("The description of an event cannot be empty.\n" +
-                    "An event must include '/from <start>' and '/to <end>'.");
-        }
-        String[] parts = args.split("/from | /to", 3);
-        if (parts.length < 3) {
-            throw new AlgoException("An event must include '/from <start>' and '/to <end>'.");
-        }
-
-        String description = parts[0].trim();
-        String from = parts[1].trim();
-        String to = parts[2].trim();
-
-        if (description.isEmpty()) {
-            throw new AlgoException("The description of an event cannot be empty.");
-        }
-        if (from.isEmpty() || to.isEmpty()) {
-            throw new AlgoException("The start and end time of an event cannot be empty.");
-        }
-
-        return new Event(description, from, to);
-    }
-
-    private static Task getTodo(String args) throws AlgoException {
-        if (args.isEmpty()) {
-            throw new AlgoException("The description of a todo cannot be empty.\n" +
-                    "Usage: todo <description>");
-        }
-        return new Todo(args);
-    }
-
-    private static Task getDeadline(String args) throws AlgoException {
-        if (args.isEmpty()) {
-            throw new AlgoException("Usage: deadline <description> /by <time>");
-        }
-
-        int byIndex = args.indexOf(" /by ");
-        if (byIndex == -1) {
-            throw new AlgoException("Usage: deadline <description> /by <time>");
-        }
-
-        String description = args.substring(0, byIndex).trim();
-        String by = args.substring(byIndex + " /by ".length()).trim();
-
-        if (description.isEmpty() || by.isEmpty()) {
-            throw new AlgoException("Usage: deadline <description> /by <time>");
-        }
-
-        return new Deadline(description, by);
     }
 
     private static void printList(Ui ui) {
@@ -224,23 +121,5 @@ public class Algo {
         System.out.println("  " + removed);
         System.out.println("Now you have " + tasks.size() + " tasks in the list.");
         ui.printLine();
-    }
-
-    private static int parseTaskIndex(String numberPart) throws AlgoException {
-        if (numberPart.isEmpty()) {
-            throw new AlgoException("Please specify a task number.");
-        }
-        int index;
-        try {
-            index = Integer.parseInt(numberPart) - 1;
-        } catch (NumberFormatException e) {
-            throw new AlgoException("Task number must be a number.");
-        }
-
-        //Edge case 2: not a positive number or out of range
-        if (index < 0 || index >= tasks.size()) {
-            throw new AlgoException("Invalid task number.");
-        }
-        return index;
     }
 }
