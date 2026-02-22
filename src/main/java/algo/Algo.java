@@ -31,48 +31,79 @@ public class Algo {
 
     private static void executeCommand(Ui ui) {
         while (true) {
-            String input = ui.readCommand();   // already trimmed
-            String lower = input.toLowerCase();
+
+            String input = ui.readCommand();
 
             try {
-                if (input.equalsIgnoreCase("bye")) {
-                    break;
-                }
+                ParsedCommand parsed = Parser.parseCommand(input);
 
-                //extract out the command and the argument
-                int spaceIndex = lower.indexOf(" ");
-                String command = (spaceIndex == -1) ? lower : lower.substring(0, spaceIndex);
-                String args = (spaceIndex == -1) ? "" : input.substring(spaceIndex + 1).trim();
+                switch (parsed.command) {
 
-                switch (command) {
+                case "bye":
+                    return;
+
                 case "list":
                     printList(ui);
                     break;
 
-                case "mark":
-                    handleMarkMessage(ui, args, true);
-                    break;
-
-                case "unmark":
-                    handleMarkMessage(ui, args, false);
-                    break;
-
-                case "delete":
-                    handleDeleteMessage(ui, args);
-                    break;
-
                 case "todo":
                 case "deadline":
-                case "event":
-                    addTask(ui, input);
+                case "event": {
+                    Task task = Parser.parseTask(parsed.fullInput);
+                    tasks.add(task);
+                    storage.save(tasks);
+
+                    ui.printLine();
+                    System.out.println("Got it. I've added this task:");
+                    System.out.println(task);
+                    System.out.println("Now you have " + tasks.size() + " tasks in the list.");
+                    ui.printLine();
                     break;
+                }
+
+                case "mark": {
+                    int index = Parser.parseIndex(parsed.args, tasks.size());
+                    Task t = tasks.get(index);
+                    t.setDone(true);
+                    storage.save(tasks);
+
+                    ui.printLine();
+                    System.out.println("Nice! I've marked this task as done:");
+                    System.out.println(t);
+                    ui.printLine();
+                    break;
+                }
+
+                case "unmark": {
+                    int index = Parser.parseIndex(parsed.args, tasks.size());
+                    Task t = tasks.get(index);
+                    t.setDone(false);
+                    storage.save(tasks);
+
+                    ui.printLine();
+                    System.out.println("OK, I've marked this task as not done yet:");
+                    System.out.println(t);
+                    ui.printLine();
+                    break;
+                }
+
+                case "delete": {
+                    int index = Parser.parseIndex(parsed.args, tasks.size());
+                    Task removed = tasks.remove(index);
+                    storage.save(tasks);
+
+                    ui.printLine();
+                    System.out.println("Noted. I've removed this task:");
+                    System.out.println("  " + removed);
+                    System.out.println("Now you have " + tasks.size() + " tasks in the list.");
+                    ui.printLine();
+                    break;
+                }
 
                 default:
-                    throw new AlgoException(
-                            "Invalid command. Try:\n" +
-                                    "todo, deadline, event, mark, unmark, list, bye, delete"
-                    );
+                    throw new AlgoException("Invalid command.");
                 }
+
             } catch (AlgoException e) {
                 ui.showErrorMessage(e.getMessage());
             }
