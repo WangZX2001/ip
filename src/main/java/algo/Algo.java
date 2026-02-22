@@ -38,28 +38,46 @@ public class Algo {
                     return;
 
                 case "list":
-                    printList(ui);
+                    ui.printLine();
+                    System.out.println(tasks.listTasks());
+                    ui.printLine();
                     break;
 
                 case "todo":
                 case "deadline":
                 case "event": {
-                    addTask(ui, parsed.fullInput);
+                    String msg = tasks.addTask(parsed.fullInput);
+                    storage.save(tasks.getAll());
+                    ui.printLine();
+                    System.out.println(msg);
+                    ui.printLine();
                     break;
                 }
 
                 case "mark": {
-                    setDone(ui, parsed.args, true);
+                    String msg = tasks.setDone(parsed.args, true);
+                    storage.save(tasks.getAll());
+                    ui.printLine();
+                    System.out.println(msg);
+                    ui.printLine();
                     break;
                 }
 
                 case "unmark": {
-                    setDone(ui, parsed.args, false);
+                    String msg = tasks.setDone(parsed.args, false);
+                    storage.save(tasks.getAll());
+                    ui.printLine();
+                    System.out.println(msg);
+                    ui.printLine();
                     break;
                 }
 
                 case "delete": {
-                    deleteTask(ui, parsed.args);
+                    String msg = tasks.deleteTask(parsed.args);
+                    storage.save(tasks.getAll());
+                    ui.printLine();
+                    System.out.println(msg);
+                    ui.printLine();
                     break;
                 }
 
@@ -72,53 +90,5 @@ public class Algo {
             }
         }
     }
-
-    private static void addTask(Ui ui, String input) throws AlgoException {
-        Task task = Parser.parseTask(input);
-        tasks.add(task);
-        storage.save(tasks.getAll());
-        ui.printLine();
-        System.out.println("Got it. I've added this task:");
-        System.out.println(task);
-        System.out.println("Now you have " + tasks.size() + " tasks in the list.");
-        ui.printLine();
-    }
-
-    private static void printList(Ui ui) {
-        ui.printLine();
-        if (tasks.isEmpty()) {
-            System.out.println("No tasks yet");
-        } else {
-            System.out.println("Here are the tasks in your list:");
-            for (int i = 0; i < tasks.size(); i++) {
-                System.out.println((i + 1) + "." + tasks.get(i));
-            }
-        }
-        ui.printLine();
-    }
-
-    private static void setDone(Ui ui, String indexArg, boolean isDone) throws AlgoException {
-        int index = Parser.parseIndex(indexArg, tasks.size());
-        Task t = tasks.get(index);
-        t.setDone(isDone);
-        storage.save(tasks.getAll());
-
-        ui.printLine();
-        System.out.println(isDone
-                ? "Nice! I've marked this task as done:"
-                : "OK, I've marked this task as not done yet:");
-        System.out.println(t);
-        ui.printLine();
-    }
-
-    private static void deleteTask(Ui ui, String indexArg) throws AlgoException {
-        int index = Parser.parseIndex(indexArg, tasks.size());
-        Task removed = tasks.delete(index);
-        storage.save(tasks.getAll());
-        ui.printLine();
-        System.out.println("Noted. I've removed this task:");
-        System.out.println("  " + removed);
-        System.out.println("Now you have " + tasks.size() + " tasks in the list.");
-        ui.printLine();
-    }
 }
+
