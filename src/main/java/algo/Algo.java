@@ -27,7 +27,6 @@ public class Algo {
 
     private static void executeCommand(Ui ui) {
         while (true) {
-
             String input = ui.readCommand();
 
             try {
@@ -98,22 +97,22 @@ public class Algo {
         ui.printLine();
     }
 
-    private static void handleMarkMessage(Ui ui, String args, boolean isMarkedAsDone) throws AlgoException {
-        int index = parseTaskIndex(args);
+    private static void setDone(Ui ui, String indexArg, boolean isDone) throws AlgoException {
+        int index = Parser.parseIndex(indexArg, tasks.size());
         Task t = tasks.get(index);
-        t.setDone(isMarkedAsDone);
+        t.setDone(isDone);
         storage.save(tasks);
 
         ui.printLine();
-        System.out.println(isMarkedAsDone
+        System.out.println(isDone
                 ? "Nice! I've marked this task as done:"
                 : "OK, I've marked this task as not done yet:");
         System.out.println(t);
         ui.printLine();
     }
 
-    private static void handleDeleteMessage(Ui ui, String args) throws AlgoException {
-        int index = parseTaskIndex(args);
+    private static void deleteTask(Ui ui, String indexArg) throws AlgoException {
+        int index = Parser.parseIndex(indexArg, tasks.size());
         Task removed = tasks.remove(index);
         storage.save(tasks);
         ui.printLine();
