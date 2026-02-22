@@ -1,10 +1,6 @@
 package algo;
 
-import algo.task.Deadline;
-import algo.task.Event;
 import algo.task.Task;
-import algo.task.Todo;
-
 import java.util.List;
 import java.util.ArrayList;
 
