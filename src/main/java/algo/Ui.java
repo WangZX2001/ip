@@ -48,4 +48,8 @@ public class Ui {
     public void printLine() {
         System.out.println(LINE);
     }
+
+    public void showLoadingError() {
+        System.out.println("Warning: Could not load tasks from storage.");
+    }
 }
