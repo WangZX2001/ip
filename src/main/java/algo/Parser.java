@@ -6,6 +6,7 @@ import algo.command.DeleteCommand;
 import algo.command.ListCommand;
 import algo.command.MarkCommand;
 import algo.command.UnmarkCommand;
+import algo.command.FindCommand;
 import algo.task.Deadline;
 import algo.task.Event;
 import algo.task.Task;
@@ -57,6 +58,7 @@ public class Parser {
             case "mark" -> new MarkCommand(args);
             case "unmark" -> new UnmarkCommand(args);
             case "delete" -> new DeleteCommand(args);
+            case "find" -> new FindCommand(args);
             default -> throw new AlgoException("Invalid command.");
         };
     }

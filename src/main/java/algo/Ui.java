@@ -1,5 +1,7 @@
 package algo;
 
+import algo.task.Task;
+import java.util.List;
 import java.util.Scanner;
 public class Ui {
     private static final String BOT_NAME = "ALGO";
@@ -56,5 +58,15 @@ public class Ui {
 
     public void showError(String message) {
         showErrorMessage(message);
+    }
+
+    public void showTaskList(List<Task> tasks) {
+        for (int i = 0; i < tasks.size(); i++) {
+            System.out.println((i + 1) + "." + tasks.get(i));
+        }
+    }
+
+    public void showMessage(String message) {
+        System.out.println(message);
     }
 }

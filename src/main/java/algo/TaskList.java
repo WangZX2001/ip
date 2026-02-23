@@ -78,4 +78,15 @@ public class TaskList {
                 + "  " + removed + "\n"
                 + "Now you have " + size() + " tasks in the list.";
     }
+
+    public List<Task> findByKeyword(String keyword) {
+        String k = keyword.toLowerCase();
+        List<Task> result = new ArrayList<>();
+        for (Task t : tasks) {
+            if (t.getDescription().toLowerCase().contains(k)) {
+                result.add(t);
+            }
+        }
+        return result;
+    }
 }
