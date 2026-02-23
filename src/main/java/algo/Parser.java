@@ -21,8 +21,6 @@ public class Parser {
             "The description of a todo cannot be empty.\n"
                     + "Usage: todo <description>";
 
-    private static final String EVENT_ERROR =
-            "Usage: event <description> /from <start> /to <end>";
 
     private static final String INDEX_EMPTY_ERROR =
             "Please specify a task number.";
@@ -164,6 +162,10 @@ public class Parser {
             ParsedDateTime fromParsed = parseDateTimeFlexibleWithFlag(fromStr);
             ParsedDateTime toParsed = parseDateTimeFlexibleWithFlag(toStr);
 
+            if (!toParsed.value.isAfter(fromParsed.value)) {
+                throw new AlgoException("Event end time must be after start time.");
+            }
+
             return new Event(description,
                     fromParsed.value, fromParsed.hasTime,
                     toParsed.value, toParsed.hasTime);
@@ -173,14 +175,7 @@ public class Parser {
         }
     }
 
-    private static class ParsedDateTime {
-        final java.time.LocalDateTime value;
-        final boolean hasTime;
-
-        ParsedDateTime(java.time.LocalDateTime value, boolean hasTime) {
-            this.value = value;
-            this.hasTime = hasTime;
-        }
+    private record ParsedDateTime(LocalDateTime value, boolean hasTime) {
     }
 
     private static ParsedDateTime parseDateTimeFlexibleWithFlag(String input) {
