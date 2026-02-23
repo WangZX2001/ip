@@ -20,8 +20,13 @@ public class FindCommand extends Command {
     }
 
     @Override
-    public void execute(TaskList tasks, Ui ui, Storage storage) {
+    public void execute(TaskList tasks, Ui ui, Storage storage) throws AlgoException {
         List<Task> matches = tasks.findByKeyword(keyword);
+
+        if (matches.isEmpty()) {
+            ui.showMessage("No matching tasks found.");
+            return;
+        }
 
         ui.showMessage("Here are the matching tasks in your list:");
         ui.showTaskList(matches);
