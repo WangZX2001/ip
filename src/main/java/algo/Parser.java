@@ -128,16 +128,13 @@ public class Parser {
 
         try {
             LocalDateTime by = LocalDateTime.parse(byStr, INPUT_DATE_TIME);
-            return new Deadline(description, by);
+            return new Deadline(description, by, true);
         } catch (DateTimeParseException ignored) {
             try {
                 LocalDate date = LocalDate.parse(byStr, INPUT_DATE);
-                return new Deadline(description, date.atStartOfDay());
+                return new Deadline(description, date.atStartOfDay(), false);
             } catch (DateTimeParseException e) {
-                throw new AlgoException("""
-                        Invalid date format. Examples:
-                        deadline return book /by 2019-10-15
-                        deadline return book /by 2019-10-15 1800""");
+                throw new AlgoException(usage);
             }
         }
     }

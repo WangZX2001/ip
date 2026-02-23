@@ -75,7 +75,10 @@ public class Storage {
 
         if (type == 'D') {
             Deadline d = (Deadline) t;
-            return "D | " + done + " | " + t.getDescription() + " | " + d.getBy().toString();
+
+            return "D | " + done + " | " + t.getDescription()
+                    + " | " + d.getBy().toString()
+                    + " | " + (d.hasTime() ? "1" : "0");
         }
         Event e = (Event) t;
         return "E | " + done + " | " + t.getDescription()
@@ -97,11 +100,9 @@ public class Storage {
         Task t = switch (type) {
             case "T" -> new Todo(desc);
             case "D" -> {
-                if (parts.length < 4) {
-                    throw new RuntimeException("Corrupted deadline");
-                }
                 LocalDateTime by = LocalDateTime.parse(parts[3].trim());
-                yield new Deadline(desc, by);
+                boolean hasTime = parts.length >= 5 && parts[4].trim().equals("1");
+                yield new Deadline(desc, by, hasTime);
             }
             case "E" -> {
                 if (parts.length < 5) {
