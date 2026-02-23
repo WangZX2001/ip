@@ -11,16 +11,16 @@ import algo.task.Event;
 import algo.task.Task;
 import algo.task.Todo;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+
 public class Parser {
     private static final String TODO_ERROR =
             "The description of a todo cannot be empty.\n"
                     + "Usage: todo <description>";
 
-    private static final String DEADLINE_ERROR =
-            "Usage: deadline <description> /by <time>";
-
-    private static final String EVENT_ERROR =
-            "Usage: event <description> /from <start> /to <end>";
 
     private static final String INDEX_EMPTY_ERROR =
             "Please specify a task number.";
@@ -30,6 +30,12 @@ public class Parser {
 
     private static final String INDEX_RANGE_ERROR =
             "Invalid task number.";
+
+    private static final DateTimeFormatter INPUT_DATE =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+    private static final DateTimeFormatter INPUT_DATE_TIME =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm");
 
     public static Command parse(String fullCommand) throws AlgoException {
         String trimmed = fullCommand.trim();
@@ -100,43 +106,87 @@ public class Parser {
     }
 
     private static Task parseDeadline(String args) throws AlgoException {
+        String usage = "Usage: deadline <desc> /by yyyy-MM-dd [HHmm]";
+
         if (args.isEmpty()) {
-            throw new AlgoException(DEADLINE_ERROR);
+            throw new AlgoException(usage);
         }
 
         int byIndex = args.indexOf(" /by ");
         if (byIndex == -1) {
-            throw new AlgoException(DEADLINE_ERROR);
+            throw new AlgoException(usage);
         }
 
         String description = args.substring(0, byIndex).trim();
-        String by = args.substring(byIndex + " /by ".length()).trim();
+        String byStr = args.substring(byIndex + " /by ".length()).trim();
 
-        if (description.isEmpty() || by.isEmpty()) {
-            throw new AlgoException(DEADLINE_ERROR);
+        if (description.isEmpty() || byStr.isEmpty()) {
+            throw new AlgoException(usage);
         }
 
-        return new Deadline(description, by);
+        try {
+            LocalDateTime by = LocalDateTime.parse(byStr, INPUT_DATE_TIME);
+            return new Deadline(description, by, true);
+        } catch (DateTimeParseException ignored) {
+            try {
+                LocalDate date = LocalDate.parse(byStr, INPUT_DATE);
+                return new Deadline(description, date.atStartOfDay(), false);
+            } catch (DateTimeParseException e) {
+                throw new AlgoException(usage);
+            }
+        }
+    }
+    private static Event parseEvent(String args) throws AlgoException {
+        String usage = "Usage: event <desc> /from yyyy-MM-dd [HHmm] /to yyyy-MM-dd [HHmm]";
+
+        if (args.isEmpty()) {
+            throw new AlgoException(usage);
+        }
+
+        int fromIndex = args.indexOf(" /from ");
+        int toIndex = args.indexOf(" /to ");
+
+        if (fromIndex == -1 || toIndex == -1 || toIndex <= fromIndex) {
+            throw new AlgoException(usage);
+        }
+
+        String description = args.substring(0, fromIndex).trim();
+        String fromStr = args.substring(fromIndex + " /from ".length(), toIndex).trim();
+        String toStr = args.substring(toIndex + " /to ".length()).trim();
+
+        if (description.isEmpty() || fromStr.isEmpty() || toStr.isEmpty()) {
+            throw new AlgoException(usage);
+        }
+
+        try {
+            ParsedDateTime fromParsed = parseDateTimeFlexibleWithFlag(fromStr);
+            ParsedDateTime toParsed = parseDateTimeFlexibleWithFlag(toStr);
+
+            if (!toParsed.value.isAfter(fromParsed.value)) {
+                throw new AlgoException("Event end time must be after start time.");
+            }
+
+            return new Event(description,
+                    fromParsed.value, fromParsed.hasTime,
+                    toParsed.value, toParsed.hasTime);
+
+        } catch (java.time.format.DateTimeParseException e) {
+            throw new AlgoException(usage);
+        }
     }
 
-    private static Event parseEvent(String args) throws AlgoException {
-        if (args.isEmpty()) {
-            throw new AlgoException(EVENT_ERROR);
+    private record ParsedDateTime(LocalDateTime value, boolean hasTime) {
+    }
+
+    private static ParsedDateTime parseDateTimeFlexibleWithFlag(String input) {
+        try {
+            return new ParsedDateTime(
+                    java.time.LocalDateTime.parse(input, INPUT_DATE_TIME),
+                    true
+            );
+        } catch (java.time.format.DateTimeParseException ignored) {
+            java.time.LocalDate date = java.time.LocalDate.parse(input, INPUT_DATE);
+            return new ParsedDateTime(date.atStartOfDay(), false);
         }
-
-        String[] parts = args.split("/from | /to", 3);
-        if (parts.length < 3) {
-            throw new AlgoException(EVENT_ERROR);
-        }
-
-        String description = parts[0].trim();
-        String from = parts[1].trim();
-        String to = parts[2].trim();
-
-        if (description.isEmpty() || from.isEmpty() || to.isEmpty()) {
-            throw new AlgoException(EVENT_ERROR);
-        }
-
-        return new Event(description, from, to);
     }
 }

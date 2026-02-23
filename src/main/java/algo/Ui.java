@@ -3,7 +3,7 @@ package algo;
 import java.util.Scanner;
 public class Ui {
     private static final String BOT_NAME = "ALGO";
-    private static final String LINE = "________________________________________________________";
+    private static final String LINE = "______________________________________________________________";
     private static final String LOGO =
             """
                       ___    _      ____   ___

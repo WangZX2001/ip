@@ -11,6 +11,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.time.LocalDateTime;
 
 public class Storage {
     private final Path filePath;
@@ -36,6 +37,7 @@ public class Storage {
             throw new AlgoException("Error saving tasks.");
         }
     }
+
     public List<Task> load() throws AlgoException {
         ArrayList<Task> loaded = new ArrayList<>();
         if (!Files.exists(filePath)) {
@@ -72,19 +74,19 @@ public class Storage {
         }
 
         if (type == 'D') {
-            int byIndex = content.indexOf("(by:");
-            String desc = content.substring(0, byIndex).trim();
-            String by = content.substring(byIndex + 4, content.length() - 1).trim();
-            return "D | " + done + " | " + desc + " | " + by;
+            Deadline d = (Deadline) t;
+
+            return "D | " + done + " | " + t.getDescription()
+                    + " | " + d.getBy().toString()
+                    + " | " + (d.hasTime() ? "1" : "0");
         }
+        Event e = (Event) t;
 
-        // Event
-        int fromIndex = content.indexOf("(from:");
-        String desc = content.substring(0, fromIndex).trim();
-        String timePart = content.substring(fromIndex + 6, content.length() - 1).trim();
-
-        String[] times = timePart.split("\\s+to:\\s+", 2);
-        return "E | " + done + " | " + desc + " | " + times[0].trim() + " | " + times[1].trim();
+        return "E | " + done + " | " + t.getDescription()
+                + " | " + e.getFrom().toString()
+                + " | " + e.getTo().toString()
+                + " | " + (e.fromHasTime() ? "1" : "0")
+                + " | " + (e.toHasTime() ? "1" : "0");
     }
 
     private Task parseTaskLine(String line) {
@@ -101,16 +103,22 @@ public class Storage {
         Task t = switch (type) {
             case "T" -> new Todo(desc);
             case "D" -> {
-                if (parts.length < 4) {
-                    throw new RuntimeException("Corrupted deadline");
-                }
-                yield new Deadline(desc, parts[3].trim());
+                LocalDateTime by = LocalDateTime.parse(parts[3].trim());
+                boolean hasTime = parts.length >= 5 && parts[4].trim().equals("1");
+                yield new Deadline(desc, by, hasTime);
             }
             case "E" -> {
-                if (parts.length < 5) {
+                if (parts.length < 7) {
                     throw new RuntimeException("Corrupted event");
                 }
-                yield new Event(desc, parts[3].trim(), parts[4].trim());
+
+                LocalDateTime from = LocalDateTime.parse(parts[3].trim());
+                LocalDateTime to = LocalDateTime.parse(parts[4].trim());
+
+                boolean fromHasTime = "1".equals(parts[5].trim());
+                boolean toHasTime = "1".equals(parts[6].trim());
+
+                yield new Event(desc, from, fromHasTime, to, toHasTime);
             }
             default -> throw new RuntimeException("Unknown task type");
         };
