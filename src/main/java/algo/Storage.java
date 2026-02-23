@@ -11,6 +11,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.time.LocalDateTime;
 
 public class Storage {
     private final Path filePath;
@@ -72,10 +73,8 @@ public class Storage {
         }
 
         if (type == 'D') {
-            int byIndex = content.indexOf("(by:");
-            String desc = content.substring(0, byIndex).trim();
-            String by = content.substring(byIndex + 4, content.length() - 1).trim();
-            return "D | " + done + " | " + desc + " | " + by;
+            Deadline d = (Deadline) t;
+            return "D | " + done + " | " + t.getDescription() + " | " + d.getBy().toString();
         }
 
         // Event
@@ -104,7 +103,8 @@ public class Storage {
                 if (parts.length < 4) {
                     throw new RuntimeException("Corrupted deadline");
                 }
-                yield new Deadline(desc, parts[3].trim());
+                LocalDateTime by = LocalDateTime.parse(parts[3].trim());
+                yield new Deadline(desc, by);
             }
             case "E" -> {
                 if (parts.length < 5) {

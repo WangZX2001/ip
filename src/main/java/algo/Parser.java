@@ -11,13 +11,15 @@ import algo.task.Event;
 import algo.task.Task;
 import algo.task.Todo;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+
 public class Parser {
     private static final String TODO_ERROR =
             "The description of a todo cannot be empty.\n"
                     + "Usage: todo <description>";
-
-    private static final String DEADLINE_ERROR =
-            "Usage: deadline <description> /by <time>";
 
     private static final String EVENT_ERROR =
             "Usage: event <description> /from <start> /to <end>";
@@ -30,6 +32,12 @@ public class Parser {
 
     private static final String INDEX_RANGE_ERROR =
             "Invalid task number.";
+
+    private static final DateTimeFormatter INPUT_DATE =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+    private static final DateTimeFormatter INPUT_DATE_TIME =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm");
 
     public static Command parse(String fullCommand) throws AlgoException {
         String trimmed = fullCommand.trim();
@@ -100,23 +108,38 @@ public class Parser {
     }
 
     private static Task parseDeadline(String args) throws AlgoException {
+        String usage = "Usage: deadline <desc> /by yyyy-MM-dd [HHmm]";
+
         if (args.isEmpty()) {
-            throw new AlgoException(DEADLINE_ERROR);
+            throw new AlgoException(usage);
         }
 
         int byIndex = args.indexOf(" /by ");
         if (byIndex == -1) {
-            throw new AlgoException(DEADLINE_ERROR);
+            throw new AlgoException(usage);
         }
 
         String description = args.substring(0, byIndex).trim();
-        String by = args.substring(byIndex + " /by ".length()).trim();
+        String byStr = args.substring(byIndex + " /by ".length()).trim();
 
-        if (description.isEmpty() || by.isEmpty()) {
-            throw new AlgoException(DEADLINE_ERROR);
+        if (description.isEmpty() || byStr.isEmpty()) {
+            throw new AlgoException(usage);
         }
 
-        return new Deadline(description, by);
+        try {
+            LocalDateTime by = LocalDateTime.parse(byStr, INPUT_DATE_TIME);
+            return new Deadline(description, by);
+        } catch (DateTimeParseException ignored) {
+            try {
+                LocalDate date = LocalDate.parse(byStr, INPUT_DATE);
+                return new Deadline(description, date.atStartOfDay());
+            } catch (DateTimeParseException e) {
+                throw new AlgoException("""
+                        Invalid date format. Examples:
+                        deadline return book /by 2019-10-15
+                        deadline return book /by 2019-10-15 1800""");
+            }
+        }
     }
 
     private static Event parseEvent(String args) throws AlgoException {
