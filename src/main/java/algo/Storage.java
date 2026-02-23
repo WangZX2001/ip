@@ -37,6 +37,7 @@ public class Storage {
             throw new AlgoException("Error saving tasks.");
         }
     }
+
     public List<Task> load() throws AlgoException {
         ArrayList<Task> loaded = new ArrayList<>();
         if (!Files.exists(filePath)) {
@@ -76,14 +77,10 @@ public class Storage {
             Deadline d = (Deadline) t;
             return "D | " + done + " | " + t.getDescription() + " | " + d.getBy().toString();
         }
-
-        // Event
-        int fromIndex = content.indexOf("(from:");
-        String desc = content.substring(0, fromIndex).trim();
-        String timePart = content.substring(fromIndex + 6, content.length() - 1).trim();
-
-        String[] times = timePart.split("\\s+to:\\s+", 2);
-        return "E | " + done + " | " + desc + " | " + times[0].trim() + " | " + times[1].trim();
+        Event e = (Event) t;
+        return "E | " + done + " | " + t.getDescription()
+                + " | " + e.getFrom().toString()
+                + " | " + e.getTo().toString();
     }
 
     private Task parseTaskLine(String line) {
@@ -110,7 +107,9 @@ public class Storage {
                 if (parts.length < 5) {
                     throw new RuntimeException("Corrupted event");
                 }
-                yield new Event(desc, parts[3].trim(), parts[4].trim());
+                LocalDateTime from = LocalDateTime.parse(parts[3].trim());
+                LocalDateTime to = LocalDateTime.parse(parts[4].trim());
+                yield new Event(desc, from, to);
             }
             default -> throw new RuntimeException("Unknown task type");
         };

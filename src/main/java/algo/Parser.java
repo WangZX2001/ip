@@ -143,23 +143,47 @@ public class Parser {
     }
 
     private static Event parseEvent(String args) throws AlgoException {
+
+        String usage = "Usage: event <desc> /from yyyy-MM-dd [HHmm] /to yyyy-MM-dd [HHmm]";
+
         if (args.isEmpty()) {
-            throw new AlgoException(EVENT_ERROR);
+            throw new AlgoException(usage);
         }
 
-        String[] parts = args.split("/from | /to", 3);
-        if (parts.length < 3) {
-            throw new AlgoException(EVENT_ERROR);
+        int fromIndex = args.indexOf(" /from ");
+        int toIndex = args.indexOf(" /to ");
+
+        if (fromIndex == -1 || toIndex == -1 || toIndex <= fromIndex) {
+            throw new AlgoException(usage);
         }
 
-        String description = parts[0].trim();
-        String from = parts[1].trim();
-        String to = parts[2].trim();
+        String description = args.substring(0, fromIndex).trim();
+        String fromStr = args.substring(fromIndex + " /from ".length(), toIndex).trim();
+        String toStr = args.substring(toIndex + " /to ".length()).trim();
 
-        if (description.isEmpty() || from.isEmpty() || to.isEmpty()) {
-            throw new AlgoException(EVENT_ERROR);
+        if (description.isEmpty() || fromStr.isEmpty() || toStr.isEmpty()) {
+            throw new AlgoException(usage);
         }
 
-        return new Event(description, from, to);
+        try {
+            LocalDateTime from = parseDateTimeFlexible(fromStr);
+            LocalDateTime to = parseDateTimeFlexible(toStr);
+
+            return new Event(description, from, to);
+
+        } catch (DateTimeParseException e) {
+            throw new AlgoException(usage);
+        }
+    }
+
+    private static LocalDateTime parseDateTimeFlexible(String input)
+            throws DateTimeParseException {
+
+        try {
+            return LocalDateTime.parse(input, INPUT_DATE_TIME);
+        } catch (DateTimeParseException ignored) {
+            LocalDate date = LocalDate.parse(input, INPUT_DATE);
+            return date.atStartOfDay();
+        }
     }
 }
