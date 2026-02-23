@@ -81,9 +81,12 @@ public class Storage {
                     + " | " + (d.hasTime() ? "1" : "0");
         }
         Event e = (Event) t;
+
         return "E | " + done + " | " + t.getDescription()
                 + " | " + e.getFrom().toString()
-                + " | " + e.getTo().toString();
+                + " | " + e.getTo().toString()
+                + " | " + (e.fromHasTime() ? "1" : "0")
+                + " | " + (e.toHasTime() ? "1" : "0");
     }
 
     private Task parseTaskLine(String line) {
@@ -105,12 +108,17 @@ public class Storage {
                 yield new Deadline(desc, by, hasTime);
             }
             case "E" -> {
-                if (parts.length < 5) {
+                if (parts.length < 7) {
                     throw new RuntimeException("Corrupted event");
                 }
+
                 LocalDateTime from = LocalDateTime.parse(parts[3].trim());
                 LocalDateTime to = LocalDateTime.parse(parts[4].trim());
-                yield new Event(desc, from, to);
+
+                boolean fromHasTime = "1".equals(parts[5].trim());
+                boolean toHasTime = "1".equals(parts[6].trim());
+
+                yield new Event(desc, from, fromHasTime, to, toHasTime);
             }
             default -> throw new RuntimeException("Unknown task type");
         };

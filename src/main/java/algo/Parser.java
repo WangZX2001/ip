@@ -138,9 +138,7 @@ public class Parser {
             }
         }
     }
-
     private static Event parseEvent(String args) throws AlgoException {
-
         String usage = "Usage: event <desc> /from yyyy-MM-dd [HHmm] /to yyyy-MM-dd [HHmm]";
 
         if (args.isEmpty()) {
@@ -163,24 +161,37 @@ public class Parser {
         }
 
         try {
-            LocalDateTime from = parseDateTimeFlexible(fromStr);
-            LocalDateTime to = parseDateTimeFlexible(toStr);
+            ParsedDateTime fromParsed = parseDateTimeFlexibleWithFlag(fromStr);
+            ParsedDateTime toParsed = parseDateTimeFlexibleWithFlag(toStr);
 
-            return new Event(description, from, to);
+            return new Event(description,
+                    fromParsed.value, fromParsed.hasTime,
+                    toParsed.value, toParsed.hasTime);
 
-        } catch (DateTimeParseException e) {
+        } catch (java.time.format.DateTimeParseException e) {
             throw new AlgoException(usage);
         }
     }
 
-    private static LocalDateTime parseDateTimeFlexible(String input)
-            throws DateTimeParseException {
+    private static class ParsedDateTime {
+        final java.time.LocalDateTime value;
+        final boolean hasTime;
 
+        ParsedDateTime(java.time.LocalDateTime value, boolean hasTime) {
+            this.value = value;
+            this.hasTime = hasTime;
+        }
+    }
+
+    private static ParsedDateTime parseDateTimeFlexibleWithFlag(String input) {
         try {
-            return LocalDateTime.parse(input, INPUT_DATE_TIME);
-        } catch (DateTimeParseException ignored) {
-            LocalDate date = LocalDate.parse(input, INPUT_DATE);
-            return date.atStartOfDay();
+            return new ParsedDateTime(
+                    java.time.LocalDateTime.parse(input, INPUT_DATE_TIME),
+                    true
+            );
+        } catch (java.time.format.DateTimeParseException ignored) {
+            java.time.LocalDate date = java.time.LocalDate.parse(input, INPUT_DATE);
+            return new ParsedDateTime(date.atStartOfDay(), false);
         }
     }
 }
