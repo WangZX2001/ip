@@ -17,6 +17,11 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
+/**
+ * Parses user input into {@link Command} objects and {@link Task} objects.
+ * This class also provides utilities for parsing indices and date/time strings
+ * used by task-related commands.
+ */
 public class Parser {
     private static final String TODO_ERROR =
             "The description of a todo cannot be empty.\n"
@@ -38,6 +43,13 @@ public class Parser {
     private static final DateTimeFormatter INPUT_DATE_TIME =
             DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm");
 
+    /**
+     * Parses the full user command string into a {@link Command}.
+     *
+     * @param fullCommand Full command string entered by the user.
+     * @return The corresponding {@link Command} instance.
+     * @throws AlgoException If the command word is not recognized.
+     */
     public static Command parse(String fullCommand) throws AlgoException {
         String trimmed = fullCommand.trim();
         String lower = trimmed.toLowerCase();
@@ -63,6 +75,14 @@ public class Parser {
         };
     }
 
+    /**
+     * Parses a task creation input (e.g., {@code todo ...}, {@code deadline ...}, {@code event ...})
+     * into a concrete {@link Task}.
+     *
+     * @param fullInput Full task input string entered by the user.
+     * @return A {@link Task} instance corresponding to the task type.
+     * @throws AlgoException If the task type is invalid or required arguments are missing.
+     */
     public static Task parseTask(String fullInput) throws AlgoException {
         String lower = fullInput.toLowerCase();
 
@@ -79,6 +99,14 @@ public class Parser {
         throw new AlgoException("Invalid task command.");
     }
 
+    /**
+     * Parses a 1-based task number into a 0-based index and validates that it is within range.
+     *
+     * @param numberPart The user-provided task number string.
+     * @param listSize The number of tasks currently in the list.
+     * @return The validated 0-based index.
+     * @throws AlgoException If the task number is missing, not a number, or out of range.
+     */
     public static int parseIndex(String numberPart, int listSize)
             throws AlgoException {
 
