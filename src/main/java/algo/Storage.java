@@ -13,13 +13,29 @@ import java.util.ArrayList;
 import java.util.List;
 import java.time.LocalDateTime;
 
+/**
+ * Handles persistent storage of tasks to a local save file.
+ * Tasks are saved in a line-based format and reconstructed when the application starts.
+ */
 public class Storage {
     private final Path filePath;
 
+    /**
+     * Creates a Storage instance that reads from and writes to the specified file path.
+     *
+     * @param filePath The path to the save file.
+     */
     public Storage(String filePath) {
         this.filePath = Paths.get(filePath);
     }
 
+    /**
+     * Saves the given list of tasks to the save file.
+     * The parent directory is created if it does not exist.
+     *
+     * @param tasks The list of tasks to be saved.
+     * @throws AlgoException If an I/O error occurs during saving.
+     */
     public void save(List<Task> tasks) throws AlgoException {
         try {
             Path parent = filePath.getParent();
@@ -38,6 +54,13 @@ public class Storage {
         }
     }
 
+    /**
+     * Loads tasks from the save file.
+     * If the file does not exist, an empty list is returned.
+     *
+     * @return A list of tasks loaded from the save file.
+     * @throws AlgoException If the save file cannot be read or is corrupted.
+     */
     public List<Task> load() throws AlgoException {
         ArrayList<Task> loaded = new ArrayList<>();
         if (!Files.exists(filePath)) {
