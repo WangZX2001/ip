@@ -256,16 +256,16 @@ In this case, the application will start with an empty task list.
 
 ## Command Summary
 
-| Command | Format |
-|--------|--------|
-| List tasks | `list` |
-| Add todo | `todo <description>` |
-| Add deadline | `deadline <description> /by yyyy-MM-dd [HHmm]` |
-| Add event | `event <description> /from yyyy-MM-dd [HHmm] /to yyyy-MM-dd [HHmm]` |
-| Mark task | `mark <task number>` |
-| Unmark task | `unmark <task number>` |
-| Delete task | `delete <task number>` |
-| Find tasks | `find <keyword>` |
-| Exit program | `bye` |
+| Command        | Format                                                              |
+|----------------|---------------------------------------------------------------------|
+| List tasks     | `list`                                                              |
+| Add todo       | `todo <description>`                                                |
+| Add deadline   | `deadline <description> /by yyyy-MM-dd [HHmm]`                      |
+| Add event      | `event <description> /from yyyy-MM-dd [HHmm] /to yyyy-MM-dd [HHmm]` |
+| Mark task      | `mark <task number>`                                                |
+| Unmark task    | `unmark <task number>`                                              |
+| Delete task    | `delete <task number>`                                              |
+| Find tasks     | `find <keyword>`                                                    |
+| Exit program   | `bye`                                                               |
 
 ---
