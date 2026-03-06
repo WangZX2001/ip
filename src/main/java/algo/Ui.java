@@ -23,7 +23,7 @@ public class Ui {
     private final Scanner scanner;
 
     /**
-     * Creates a Ui instance that reads user input from the console.
+     * Creates an Ui instance that reads user input from the console.
      */
     public Ui() {
         this.scanner = new Scanner(System.in);

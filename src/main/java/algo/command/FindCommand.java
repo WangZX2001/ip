@@ -36,10 +36,9 @@ public class FindCommand extends Command {
      * @param tasks The task list containing all tasks.
      * @param ui The user interface used to display messages and task lists.
      * @param storage The storage handler (not used in this command).
-     * @throws AlgoException If an error occurs during task searching.
      */
     @Override
-    public void execute(TaskList tasks, Ui ui, Storage storage) throws AlgoException {
+    public void execute(TaskList tasks, Ui ui, Storage storage) {
         List<Task> matches = tasks.findByKeyword(keyword);
 
         if (matches.isEmpty()) {
